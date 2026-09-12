@@ -1,0 +1,64 @@
+{
+  "artifacts": [
+    {
+      "bytes": 88707,
+      "filename": "peoplebot-0.1.0a2-py3-none-any.whl",
+      "sha256": "b4adede1962ddd5f63f656d1f586b8a2f3216189e6e25e5e403f882d0e7e9d36",
+      "type": "wheel"
+    },
+    {
+      "bytes": 162843,
+      "filename": "peoplebot-0.1.0a2.tar.gz",
+      "sha256": "2faebf8210ba7a6f3b6ae091e95c0cc656a2ece85f7fe19b4d0a32aa846049d4",
+      "type": "sdist"
+    }
+  ],
+  "correction": {
+    "description": "Project-specific documentation was removed from the public package, the consuming-environment boundary was made project-neutral, and repository-only guidance and planning were excluded from the source distribution.",
+    "implementation_changed": false,
+    "supersedes": "0.1.0a1"
+  },
+  "distribution": {
+    "proposed_repository": "https://github.com/peoplebot-framework/peoplebot-releases",
+    "proposed_tag": "v0.1.0a2",
+    "publication_verified": false
+  },
+  "format": "peoplebot.public-release-provenance.v1",
+  "inspection": {
+    "archive_entry_types_safe": true,
+    "archive_unsafe_paths": 0,
+    "duplicate_archive_paths": 0,
+    "forbidden_consuming_project_or_control_matches": 0,
+    "license_files_match": true,
+    "package_metadata_version": "0.1.0a2",
+    "private_or_historical_package_paths": 0,
+    "public_relative_links_missing": 0,
+    "review_date": "2026-09-11",
+    "wheel_record_valid": true,
+    "wheel_sdist_source_files_match": true
+  },
+  "license": "GPL-3.0-only",
+  "package": {
+    "name": "peoplebot",
+    "requires_python": ">=3.11",
+    "runtime_dependencies": [],
+    "version": "0.1.0a2"
+  },
+  "source": {
+    "canonical_repository": "https://github.com/peoplebot-framework/peoplebot",
+    "commit": "e3977c11a9e7ed57637fb7790179540afc43dddd",
+    "matching_public_source": {
+      "bytes": 162843,
+      "filename": "peoplebot-0.1.0a2.tar.gz",
+      "sha256": "2faebf8210ba7a6f3b6ae091e95c0cc656a2ece85f7fe19b4d0a32aa846049d4"
+    }
+  },
+  "validation": {
+    "fresh_virtual_environment": true,
+    "installation_dependency_resolution": false,
+    "installed_version": "0.1.0a2",
+    "module_cli_help": "passed",
+    "console_cli_help": "passed",
+    "runtime_source_unchanged_from_0.1.0a1": true
+  }
+}

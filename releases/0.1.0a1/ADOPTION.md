@@ -1,7 +1,10 @@
 # Adoption in a separate sovereign environment
 
-These instructions are preparatory. All release URLs remain proposed until public
-publication and unauthenticated download verification are complete.
+These instructions were prepared before publication. The release was subsequently
+published and its unauthenticated asset downloads were verified.
+
+Version `0.1.0a1` is superseded by `0.1.0a2` for new installations. The historical
+package remains public; use the corrected release when available.
 
 ## Boundary
 
@@ -11,7 +14,7 @@ project history. Do not copy PeopleBot development credentials, private Git
 history, runtime memory, Execution evidence, or workspace control configuration.
 
 PeopleBot is a pinned dependency. Installing it does not create an Architect,
-grant authority, provision repositories, or create any NormsExchange resource.
+grant authority, provision repositories, or create any consuming-project resource.
 
 ## Minimal verified installation
 

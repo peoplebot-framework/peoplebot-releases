@@ -1,7 +1,11 @@
 # PeopleBot 0.1.0a1
 
-Status during preparation: proposed experimental public prerelease; not yet
-published.
+Historical preparation status: proposed experimental public prerelease. The
+release was subsequently published as a public prerelease.
+
+Current status: superseded by [`0.1.0a2`](../0.1.0a2/RELEASE_NOTES.md). The newer
+prerelease removes project-specific documentation. This current-file correction
+does not erase the original public Git objects or downloads.
 
 ## Exact accepted source and artifacts
 
@@ -37,15 +41,15 @@ the artifacts and both identities without equating them.
 - demonstrated real GitHub runtime-memory transport in a separate environment;
 - messaging, schedules, UI, or automatic learning.
 
-Installing this package does not create a NormsExchange Architect or transfer any
-identity, credentials, authority, memory, or project history.
+Installing this package does not create a consuming-project Architect or transfer
+any identity, credentials, authority, memory, or project history.
 
 ## Public-safety and packaging review
 
 The archive inventories and per-member SHA-256 values match the original private
 candidate evidence. The wheel `RECORD` validates; archive paths and entry types are
-safe; no credential signatures or obsolete agent-control/SessionEnd configuration
-were found.
+safe; no credential signatures or inherited private-control configuration were
+found.
 
 The original private evidence JSON contains two local Windows validation paths and
 is not a public asset. The separately hashed public provenance derivative omits
