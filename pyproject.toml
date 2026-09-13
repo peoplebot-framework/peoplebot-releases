@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "peoplebot"
+version = "0.1.0a3"
+description = "Experimental Git-native PeopleBot V2 foundation"
+readme = "README.package.md"
+requires-python = ">=3.11"
+license = "GPL-3.0-only"
+license-files = ["LICENSE", "LICENSING.md"]
+authors = [{name = "Guthrie E Services, LLC"}]
+dependencies = []
+
+[project.scripts]
+peoplebot = "peoplebot.__main__:main"
+
+[project.urls]
+Repository = "https://github.com/peoplebot-framework/peoplebot"
+
+[tool.setuptools]
+include-package-data = false
+packages = ["peoplebot", "peoplebot.adapters", "peoplebot.blueprints"]
+
+[tool.setuptools.package-data]
+"peoplebot.adapters" = ["codex_read_only/adapter.json", "project_review/adapter.json"]
+"peoplebot.blueprints" = ["project_review/blueprint.json"]

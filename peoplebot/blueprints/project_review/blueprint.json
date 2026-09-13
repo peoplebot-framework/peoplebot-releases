@@ -1,0 +1,41 @@
+{
+  "agent_type": "peoplebot.project-review",
+  "authority": {
+    "blueprint_modification": false,
+    "external_publication": false,
+    "framework_modification": false,
+    "messaging": false,
+    "project_access": "read-only-supplied-context",
+    "scheduling": false
+  },
+  "expected_output": {
+    "citation": "exact-repository-commit-path",
+    "format": "peoplebot.project-review-response.v0",
+    "insufficient_evidence": true,
+    "max_findings": 8,
+    "no_findings": true
+  },
+  "format": "peoplebot.project-review-blueprint.v0",
+  "memory": {
+    "automatic_checkpoint": false,
+    "save_authority": "explicit-caller-operation"
+  },
+  "purpose": "Review explicitly supplied pinned project material for a caller-supplied objective and return bounded cited findings, a no-findings outcome, or an insufficient-evidence outcome.",
+  "required_inputs": [
+    "owning_environment_identity",
+    "instance_identity",
+    "objective",
+    "pinned_project_state",
+    "explicit_context_selection",
+    "context_policy_state"
+  ],
+  "stopping": {
+    "model_invocations_max": 1,
+    "self_retry": false,
+    "stop_on_insufficient_evidence": true,
+    "stop_on_no_findings": true,
+    "stop_on_runtime_or_validation_failure": true
+  },
+  "supported_task": "bounded-supplied-context-project-review",
+  "version": "0"
+}

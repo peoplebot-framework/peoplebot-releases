@@ -1,0 +1,69 @@
+{
+  "blueprint_format": "peoplebot.project-review-blueprint.v0",
+  "format": "peoplebot.codex-project-review-adapter.v0",
+  "limits": {
+    "max_citations_per_finding": 4,
+    "max_context_blob_bytes": 32768,
+    "max_context_entries": 16,
+    "max_context_total_blob_bytes": 49152,
+    "max_explanation_characters": 1200,
+    "max_findings": 8,
+    "max_insufficient_evidence_characters": 1200,
+    "max_objective_bytes": 4096,
+    "max_prompt_bytes": 65536,
+    "max_response_bytes": 16384,
+    "max_stderr_bytes": 16384,
+    "max_stdout_bytes": 65536,
+    "max_suggested_action_characters": 600,
+    "max_title_characters": 160
+  },
+  "model": "gpt-5.6-luna",
+  "response_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "findings": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "citations": {
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
+                  "path": {"minLength": 1, "type": "string"},
+                  "repository": {"maxLength": 512, "minLength": 1, "type": "string"}
+                },
+                "required": ["commit", "path", "repository"],
+                "type": "object"
+              },
+              "maxItems": 4,
+              "minItems": 1,
+              "type": "array"
+            },
+            "explanation": {"maxLength": 1200, "minLength": 1, "type": "string"},
+            "severity": {"enum": ["low", "medium", "high"], "type": "string"},
+            "suggested_action": {"maxLength": 600, "minLength": 1, "type": "string"},
+            "title": {"maxLength": 160, "minLength": 1, "type": "string"}
+          },
+          "required": ["citations", "explanation", "severity", "suggested_action", "title"],
+          "type": "object"
+        },
+        "maxItems": 8,
+        "type": "array"
+      },
+      "insufficient_evidence": {
+        "anyOf": [
+          {"maxLength": 1200, "minLength": 1, "type": "string"},
+          {"type": "null"}
+        ]
+      },
+      "outcome": {"enum": ["findings", "insufficient_evidence", "no_findings"], "type": "string"}
+    },
+    "required": ["findings", "insufficient_evidence", "outcome"],
+    "type": "object"
+  },
+  "runtime": "codex-cli",
+  "runtime_version": "0.153.4",
+  "sandbox": "read-only",
+  "timeout_seconds": 120
+}

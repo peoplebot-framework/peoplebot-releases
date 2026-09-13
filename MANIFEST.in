@@ -1,0 +1,23 @@
+include LICENSE
+include LICENSING.md
+include README.package.md
+include pyproject.toml
+recursive-include peoplebot *.py *.json
+recursive-include tests *.py
+recursive-include config *.json
+recursive-include docs/contracts *.md
+include docs/releases/public-distribution-inspection.md
+include docs/releases/release-a-0.1.0a3.md
+include docs/examples/instance_memory_checkpoint.py
+include docs/examples/project_review_fake.py
+include releases/0.1.0a3/ADOPTION.md
+include releases/0.1.0a3/RELEASE_NOTES.md
+exclude README.md
+global-exclude *.py[cod]
+global-exclude *.log
+global-exclude .env .env.*
+global-exclude *.local *.local.*
+global-exclude Thumbs.db .DS_Store
+prune __pycache__
+prune build
+prune dist

@@ -1,0 +1,46 @@
+{
+  "format": "peoplebot.codex-read-only-adapter.v0",
+  "max_prompt_bytes": 32768,
+  "max_rendered_answer_characters": 2000,
+  "max_response_bytes": 4096,
+  "max_stderr_bytes": 16384,
+  "max_stdout_bytes": 65536,
+  "model": "gpt-5.6-luna",
+  "response_schema": {
+    "additionalProperties": false,
+    "properties": {
+      "advertising_required": {"const": false, "type": "boolean"},
+      "citation": {
+        "additionalProperties": false,
+        "properties": {
+          "commit": {"pattern": "^[0-9a-f]{40}$", "type": "string"},
+          "path": {"const": "LICENSING.md", "type": "string"},
+          "repository": {"maxLength": 512, "minLength": 1, "type": "string"}
+        },
+        "required": ["commit", "path", "repository"],
+        "type": "object"
+      },
+      "distribution_scope": {"const": "distribution_of_covered_material", "type": "string"},
+      "gpl_version": {"const": "GPL-3.0-only", "type": "string"},
+      "preserve_existing_credit": {"const": true, "type": "boolean"},
+      "preserve_license": {"const": true, "type": "boolean"},
+      "preserve_required_notices": {"const": true, "type": "boolean"},
+      "provide_corresponding_source": {"const": true, "type": "boolean"}
+    },
+    "required": [
+      "advertising_required",
+      "citation",
+      "distribution_scope",
+      "gpl_version",
+      "preserve_existing_credit",
+      "preserve_license",
+      "preserve_required_notices",
+      "provide_corresponding_source"
+    ],
+    "type": "object"
+  },
+  "runtime": "codex-cli",
+  "runtime_version": "0.153.4",
+  "sandbox": "read-only",
+  "timeout_seconds": 120
+}

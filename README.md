@@ -3,7 +3,19 @@
 This repository distributes reviewed PeopleBot release artifacts without exposing
 the private development repository's Git history or operational environment.
 
-## Current corrected prerelease: 0.1.0a2
+## Proposed prerelease candidate: 0.1.0a3
+
+The local `0.1.0a3` candidate adds the accepted bounded project-review Blueprint
+and purpose-specific Adapter to the public distribution tree. It remains pending
+read-only review and separate publication authorization. No tag, release, or
+public asset exists for this candidate yet.
+
+The candidate source tree includes exact public paths for the Blueprint and
+Adapter, plus project-neutral adoption instructions under
+[`releases/0.1.0a3`](releases/0.1.0a3/ADOPTION.md). Installation alone does not
+create or activate an Instance.
+
+## Current published prerelease: 0.1.0a2
 
 PeopleBot `0.1.0a2` is an experimental prerelease of Git-native framework
 utilities. It is not a functioning Architect or a ready-made project-task agent.
