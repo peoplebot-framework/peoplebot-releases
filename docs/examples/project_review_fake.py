@@ -57,7 +57,7 @@ def main() -> None:
     parser.add_argument("--framework-checkout", default=str(Path(__file__).parents[2]))
     parser.add_argument(
         "--framework-repository",
-        default="https://github.com/peoplebot-framework/peoplebot",
+        default="https://github.com/peoplebot-framework/peoplebot-releases",
     )
     args = parser.parse_args()
     framework = Path(args.framework_checkout).resolve()

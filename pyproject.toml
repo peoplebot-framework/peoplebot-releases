@@ -17,7 +17,7 @@ dependencies = []
 peoplebot = "peoplebot.__main__:main"
 
 [project.urls]
-Repository = "https://github.com/peoplebot-framework/peoplebot"
+Repository = "https://github.com/peoplebot-framework/peoplebot-releases"
 
 [tool.setuptools]
 include-package-data = false
