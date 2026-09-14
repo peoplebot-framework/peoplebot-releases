@@ -1,0 +1,18 @@
+{
+  "version": "syslog-onboarding-v0.1.0",
+  "canonical_origin": "https://github.com/peoplebot-framework/peoplebot",
+  "development_source_commit": "49da7a3e0af20680cdcffeee62c44d3a6fd108ba",
+  "source_path": "procedures/syslog-onboarding/",
+  "distribution_repository": "https://github.com/peoplebot-framework/peoplebot-releases",
+  "distribution_tag": "syslog-onboarding-v0.1.0",
+  "scope": "Standalone source procedure; no framework runtime installation",
+  "source_sha256": {
+    "README.md": "1909fd7f6c758b89271780dea378e2390795268d18a2e62be75e55a79c577a28",
+    "SECURITY.md": "be45149c379e55b849b98e4a962008faf247c9b7eeb46e35b3ceff5f5333f8ca",
+    "prepare.py": "03d7b19c6f151c85f3d3f8fe48eacee01fcf2b271535fc2f71bf3299cd5812df",
+    "request.example.json": "b369f9a0f705403b45665a56fd39bce10d9230f814e80983abe2bd5f38fc40c4",
+    "test_prepare.py": "bd71215d052dfb1f275b6c9a8490793c5bc0569b7e41fe59964e3d10ae3fa22e",
+    "LICENSE": "3972dc9744f6499f0f9b2dbf76696f2ae7ad8af9b23dde66d6af86c9dfb36986",
+    "LICENSING.md": "3b55df62c7d5aa89f73111e10411684148349e5bcda18da623bf893a4df614f9"
+  }
+}

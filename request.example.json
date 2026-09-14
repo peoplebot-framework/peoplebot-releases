@@ -1,0 +1,9 @@
+{
+  "format": "peoplebot.syslog.enrollment.v0",
+  "project": "example-project",
+  "environment": "example-workstation",
+  "repositories": [],
+  "events": ["*"],
+  "destination": null,
+  "gateway_url": null
+}
