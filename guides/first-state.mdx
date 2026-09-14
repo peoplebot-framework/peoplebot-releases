@@ -1,0 +1,66 @@
+---
+title: "Resolve your first State"
+description: "A complete local example that identifies one file at an exact commit."
+---
+
+**Release:** 0.1.0a3. **Model calls:** none. **Result:** a JSON description of a committed Git object.
+
+Complete [installation](/guides/install) first. Run the commands below from the directory containing your `.venv` folder. Git 2.45 or newer is required.
+
+## 1. Get the public source
+
+Use a new destination directory. The clone downloads source; the PeopleBot resolution command itself reads only local Git objects.
+
+```bash
+git clone https://github.com/peoplebot-framework/peoplebot-releases.git peoplebot-source
+git -C peoplebot-source switch --detach 14b15c8bfb0b4ce9f0d827fe018b42af04969945
+```
+
+A detached checkout here deliberately selects the published distribution commit. You do not need to edit or commit anything.
+
+## 2. Resolve one file
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe -m peoplebot resolve-state --repository https://github.com/peoplebot-framework/peoplebot-releases --checkout ./peoplebot-source --commit 14b15c8bfb0b4ce9f0d827fe018b42af04969945 --path peoplebot/state.py
+```
+
+Linux:
+
+```bash
+./.venv/bin/python -m peoplebot resolve-state --repository https://github.com/peoplebot-framework/peoplebot-releases --checkout ./peoplebot-source --commit 14b15c8bfb0b4ce9f0d827fe018b42af04969945 --path peoplebot/state.py
+```
+
+## 3. Read the result
+
+The output is one JSON object. Key values are:
+
+| Field | Expected value or meaning |
+| --- | --- |
+| `format` | `peoplebot.resolved-state.v0` |
+| `reference.commit` | `14b15c8bfb0b4ce9f0d827fe018b42af04969945` |
+| `reference.path` | `peoplebot/state.py` |
+| `selected_type` | `blob`, meaning file content |
+| `selected_object` | `e16015f001cd56f0bfa30af71d6e7e3a6b41b4bb` |
+| `root_tree` | The tree object for the selected commit |
+
+This identifies the file; it does not print its contents. To inspect the same committed content using Git:
+
+```bash
+git -C peoplebot-source show 14b15c8bfb0b4ce9f0d827fe018b42af04969945:peoplebot/state.py
+```
+
+## 4. Understand what stays fixed
+
+Running the same command again uses the same commit even if `main` later changes. Uncommitted edits in the checkout do not become part of this State. Omitting `--path` resolves the commit itself; selecting a committed directory yields a tree.
+
+`--repository` is the identity recorded in the result. The resolver does not authenticate that label against the remote URL. Use the correct repository identity in your own configuration.
+
+## Next step
+
+Use [context selection](/guides/context) to retrieve bounded file contents with their exact source references. If resolution fails, consult the [error table](/guides/troubleshooting).
+
+## Public reference
+
+[State resolver](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/peoplebot/state.py).

@@ -1,0 +1,49 @@
+---
+title: "Command-line reference"
+description: "The four CLI commands included in the public framework release."
+---
+
+**Release:** 0.1.0a3. Use the Python interpreter from your installed virtual environment. The examples below use `python` to denote that interpreter; [installation](/guides/install) gives explicit Windows and Linux paths.
+
+```bash
+python -m peoplebot --help
+python -m peoplebot resolve-state --help
+```
+
+## Command overview
+
+| Command | Purpose |
+| --- | --- |
+| `resolve-state` | Inspect a locally available exact commit or path |
+| `alpha-setup` | Record an explicitly supplied synthetic framework selection |
+| `alpha-adopt` | Adopt a compatible synthetic framework State |
+| `alpha-resume` | Retrieve exact synthetic Instance memory in a fresh process |
+
+Context assembly, project reviews, memory saving, and memory transport are Python APIs in this version. There are no `peoplebot publish`, `peoplebot start`, or `peoplebot schedule` commands in the release.
+
+## resolve-state
+
+| Option | Required | Value |
+| --- | --- | --- |
+| `--repository` | Yes | Stable repository identity recorded in the State |
+| `--checkout` | Yes | Local Git checkout path |
+| `--commit` | Yes | Lowercase full 40-character Git commit ID |
+| `--path` | No | Canonical committed path, using forward slashes |
+
+A branch name, abbreviated SHA, or absolute filesystem path is not valid in the corresponding commit/path field. Resolution reads Git objects, not working-tree edits, and does not fetch absent commits.
+
+Successful output is JSON on standard output. Classified errors are written to standard error. The CLI returns `0` on success, `2` for invalid input, `3` for State resolution failures, and `4` for alpha-operation failures. These codes do not cover every possible unhandled operating-system or Python failure.
+
+See [the complete first-State example](/guides/first-state).
+
+## Alpha commands
+
+These expose a synthetic local experiment. They do not provision GitHub accounts, install model runtimes, discover releases, create production agents, or activate schedules.
+
+All three require caller-supplied environment checkout/repository, environment identity, and Instance identity. Setup takes exact framework paths and a creation timestamp. Adoption additionally takes an existing selection commit, a candidate framework selection, runtime root, execution identity, and timestamps. Resume takes exact selection/memory commits, source checkouts, and one or more requested memory paths.
+
+Use each command's `--help` and the exact alpha contract for the full input set. Guessing bindings or substituting a mutable branch for a pinned State defeats the experiment's purpose.
+
+## Public reference
+
+[CLI source](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/peoplebot/__main__.py), [Alpha contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/alpha-bootstrap-v0.md).

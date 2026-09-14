@@ -1,0 +1,43 @@
+---
+title: "Messaging and automatic operation"
+description: "The intended coordination model and the boundary of the public release."
+---
+
+<Note>
+**Architecture guide:** the public framework release **0.1.0a3 does not implement message transport or scheduling**. This page explains the intended model. It does not provide working publish, reply, or scheduler commands for that release.
+</Note>
+
+## Sovereign messaging
+
+Each environment owns an outbound messages repository. It publishes its messages there. Authorized peers read that repository and publish replies from their own outbound repositories. Git hosting permissions control access; a sender or recipient name inside a message does not grant it.
+
+This lets each environment retain ownership of its own outbound history while sharing the specific work another environment needs.
+
+## A useful development exchange
+
+The intended workflow is a bounded task followed by implementation, an independent review of the exact candidate commit, and either correction or acceptance. Each handoff needs enough information to identify the work:
+
+| Information | Purpose |
+| --- | --- |
+| Sender and recipient | Identify participating actors |
+| Task objective and permitted scope | Explain the authorized work |
+| Correlation identity | Associate replies with the original request |
+| Exact source/candidate State | Let another actor inspect the same version |
+| Outcome and evidence references | Distinguish a report from its supporting artifacts |
+| Stop conditions | Define when work should end or require a decision |
+
+This is a conceptual checklist, not a published message schema for 0.1.0a3.
+
+An execution record's `input_messages` field can hold State references. That field alone does not publish, deliver, read, or acknowledge a message.
+
+## What a schedule contributes
+
+A scheduler starts a process at a time. An operational worker also needs a way to find eligible work, avoid overlapping executions, apply a finite budget, persist progress, and recognize completed work after restart.
+
+For a future scheduled workflow, useful acceptance evidence would include a real timed launch under the intended account, working authentication, one completed task, a tested stop control, and a fresh-process continuation without repeating completed work. An idle check should not require a model call.
+
+Those are readiness criteria, not features provided by this release. The synthetic alpha utilities are not hourly workers. See [current capabilities](/guides/capabilities) and [environment setup](/guides/environments) before relying on an automated workflow.
+
+## Public reference
+
+[Public architectural overview](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/README.package.md), [Execution record](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/peoplebot/execution.py).

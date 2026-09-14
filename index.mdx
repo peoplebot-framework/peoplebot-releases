@@ -1,22 +1,41 @@
 ---
 title: "PeopleBot"
-description: "A Git-native foundation for durable agent work."
+description: "Understand the framework, install the public release, and try a real local example."
 ---
 
-PeopleBot uses Git to give agent work an addressable history: the inputs an execution used, the work it attempted, and the results it saved. Its design separates reusable behavior from individual agents and their saved state.
+PeopleBot is a Git-native framework for agent work that can be saved, inspected, and continued. It gives tasks an exact record of the source they used and the results they produced. The design keeps reusable agent behavior separate from each agent's identity, memory, and runtime.
 
-These guides cover **the public experimental release 0.1.0a3**. Installing it provides framework utilities and a bounded project-review adapter. It does not start an autonomous agent or a scheduled development service.
+The practical goal is to let agents work across sessions and environments without relying on one growing conversation. Git stores known state; model invocations handle tasks that require inference.
 
-## Get started
+<Note>
+These guides describe the public **0.1.0a3 experimental framework release**. It includes deterministic utilities and a bounded project-review adapter. Installing it does not start an autonomous worker. See the [capability table](/guides/capabilities) for the release boundary.
+</Note>
 
-1. [Install the public package](/guides/install) and check the command-line interface.
-2. [Check the release capabilities](/guides/capabilities) before choosing a workflow.
-3. [Learn the five core concepts](/guides/concepts) to understand how the pieces fit.
+## Choose your starting point
 
-The public [release page](https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a3) provides the package, matching source archive, checksums, and provenance. No private repository access is required.
+| Your goal | Start here |
+| --- | --- |
+| Understand the idea | [Five core concepts](/guides/concepts) |
+| Install the public utilities | [Installation](/guides/install) |
+| Run something useful without a model account | [Resolve your first State](/guides/first-state) |
+| Supply exact files to an agent | [Context selection](/guides/context) |
+| Prepare your own environment | [Environment setup](/guides/environments) |
+| Understand the review adapter | [Project reviews](/guides/project-review) |
+| Save work for another execution | [Memory and recovery](/guides/memory) |
+| Diagnose a failed command | [Troubleshooting](/guides/troubleshooting) |
+
+## What a durable task needs
+
+A useful task needs a clear objective, exact inputs, an execution boundary, and evidence of the result. For example, a review can refer to one committed parser file instead of whichever version happens to be on a branch when someone reads the report.
+
+That record makes later inspection possible. It does not make a model's answer automatically correct: tests, cited evidence, and independent review still matter.
+
+## Public distribution
+
+The [public repository](https://github.com/peoplebot-framework/peoplebot-releases) contains distributable source and release artifacts. These guides require no private development or operational access. Read the [release guide](/reference/releases) to distinguish framework versions from separately released services.
 
 ## License and credit
 
 Guthrie E Services, LLC created PeopleBot.
 
-The distribution is licensed GPL-3.0-only. See the [license](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/LICENSE) and [licensing declaration](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/LICENSING.md).
+PeopleBot is distributed under GPL-3.0-only. The complete [license](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/LICENSE) and [licensing declaration](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/LICENSING.md) accompany the distribution.

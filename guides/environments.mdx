@@ -1,0 +1,48 @@
+---
+title: "Prepare an environment"
+description: "Understand the identities and runtime inputs that installation does not create."
+---
+
+**Release:** 0.1.0a3. This is a setup reference for integrators, not an automatic provisioning command.
+
+An environment is the ownership boundary around an agent's runtime, repositories, credentials, Instances, and memory. Installing PeopleBot supplies reusable code. You separately decide where it runs, which projects it can access, and what work it may do.
+
+## Keep the responsibilities clear
+
+| Resource | What the environment supplies |
+| --- | --- |
+| Environment identity | A stable identity for the owning environment |
+| Instance identity | The particular actor that will execute a task |
+| Blueprint and adapter | Exact public source references and matching installed implementation |
+| Project inputs | Repository identity, full commit, selected paths, and context policy |
+| Runtime | Supported operating system, Python, Git, and any required model CLI |
+| Evidence store | Local Git repository and an absolute runtime directory |
+| Authentication | Credentials configured outside shared task content |
+| Memory | Explicit content, owner bindings, expected State, and optional transport configuration |
+| Task authority | Objective, permitted actions, limits, and stopping conditions |
+
+A repository identity is not a checkout path. An Instance identity is not an operating-system account. Record each binding explicitly rather than assuming matching names connect the resources.
+
+## Start with a small verified operation
+
+1. Install the exact release and retain its source and provenance.
+2. Complete the [local State example](/guides/first-state).
+3. Assemble a small, explicit context selection.
+4. If you need the review adapter, use Windows and inspect the [review prerequisites](/guides/project-review).
+5. Check execution evidence and any saved memory separately.
+
+The synthetic `alpha-setup`, `alpha-adopt`, and `alpha-resume` utilities are not shortcuts for these steps. They demonstrate local mechanics with supplied fixture bindings.
+
+## One active execution per Instance
+
+The v0 admission path uses a Windows file lock. Competing work for the same environment/Instance is rejected without launching its callback. Every launch path must use the same runtime-root binding for that local admission scheme to coordinate correctly. It is not a distributed lock across machines.
+
+Separate actors should use separate Instance identities. Copying a Blueprint into another environment creates the basis for a new actor; it does not transfer an existing actor's credentials, memory, or permission to act.
+
+## Updating the framework
+
+Treat a version label as a discovery aid and adopt the intended source commit and artifacts explicitly. Keep an active execution on its pinned implementation until it finishes. General cross-version migration is not provided by this release; the synthetic adoption example has a narrower compatibility contract.
+
+## Public reference
+
+[Environment adoption contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/sovereign-environment-adoption-v0.md), [Admission contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/instance-admission-v0.md).

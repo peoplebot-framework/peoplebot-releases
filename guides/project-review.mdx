@@ -1,0 +1,67 @@
+---
+title: "Project reviews"
+description: "Understand the supplied-context reviewer, its inputs, and the meaning of its output."
+---
+
+**Release:** 0.1.0a3. **Runtime:** Windows execution/admission path. The published release record reports no live CLI/model acceptance check for this adapter.
+
+The review Blueprint asks a model to inspect explicitly supplied project text for a bounded objective. It can report cited findings, no findings, or insufficient evidence. It does not edit code, discover additional context, save memory automatically, or run an unattended correction loop.
+
+## Supply a reviewable task
+
+A useful objective is specific: “Check whether this parser handles empty input according to the supplied tests.” Include the requirement and relevant tests in the committed context. “Check everything” gives no practical boundary and may request evidence the model cannot see.
+
+The caller provides:
+
+1. The framework checkout and exact Blueprint/adapter State.
+2. The project checkout and starting commit.
+3. Explicit project paths and a context policy stored at that same project commit.
+4. An `ExecutionStart` binding the objective, environment, Instance, and inputs.
+5. Runtime paths, authentication context, an evidence store, and timestamps.
+
+The wrapper verifies the policy against its Git blob and requires the recorded input States to match the selected documents in deterministic order.
+
+## Release-specific limits
+
+| Setting | Value |
+| --- | --- |
+| Codex CLI version | `0.153.4` |
+| Configured model | `gpt-5.6-luna` |
+| Runtime timeout | 120 seconds |
+| Model invocations per execution | At most one; no automatic retry |
+| Context documents | At most 16 |
+| Bytes per context blob | At most 32,768 |
+| Total context blob bytes | At most 49,152 |
+| Findings | At most 8 |
+| Citations per finding | 1–4 exact source references |
+
+These are the published adapter's constraints. They are not a recommendation to assume compatibility with a newer CLI or substitute a different model without validation.
+
+## Read the outcome
+
+| Review outcome | Meaning | Useful next action |
+| --- | --- | --- |
+| `findings` | One or more bounded observations with citations | Inspect the cited code and verify the claimed issue |
+| `no_findings` | No issue identified within an adequate supplied scope | Combine with tests and other evidence; do not treat it as proof of correctness |
+| `insufficient_evidence` | Supplied material cannot support the requested review | Add the missing requirement or source and define a new bounded attempt |
+| Failed execution | Runtime, response validation, or evidence handling failed | Inspect the recorded failure before attempting another run |
+
+The review outcome and the execution status are different fields. A conformant review can finish as a `no_change` execution because it did not change project State.
+
+## Try the existing offline demonstration
+
+On Windows, from the directory containing `.venv` and the pinned `peoplebot-source` checkout:
+
+```powershell
+.\.venv\Scripts\python.exe ./peoplebot-source/docs/examples/project_review_fake.py --framework-checkout ./peoplebot-source
+```
+
+This demonstration creates a temporary synthetic project and injects a fake provider response citing an empty-input bug. It exercises the wrapper mechanics without making a model call. It is not evidence that a real model correctly reviewed the project. This documentation expansion did not rerun the Windows-only example on Linux.
+
+## Evidence and follow-up
+
+A response passing schema checks establishes format conformance. It does not establish factual correctness. Keep exact input and result references so someone else can inspect the same material. Use separate [memory operations](/guides/memory) when selected knowledge should survive into a future execution.
+
+## Public reference
+
+[Review contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/project-review-v0.md), [Adapter configuration](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/peoplebot/adapters/project_review/adapter.json), [Offline example](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/examples/project_review_fake.py).

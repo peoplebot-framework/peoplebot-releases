@@ -1,0 +1,78 @@
+---
+title: "Select context"
+description: "Retrieve only the committed text needed for a task, with explicit size limits."
+---
+
+**Release:** 0.1.0a3. **Model calls:** none. This is a Python API, not a separate CLI command.
+
+Context assembly takes an exact repository State, selected paths, and a policy. It reads file contents from Git objects and returns those contents together with their provenance. It does not search a project to decide what matters.
+
+## Choose the scope
+
+For a parser review, useful input might include the parser, its tests, and the behavior requirements. A directory selection expands to tracked files. Overlapping selections are deduplicated. Selecting the whole repository often adds irrelevant material and consumes the policy budget.
+
+| Policy field | What it limits |
+| --- | --- |
+| `max_entries` | Number of selected entries |
+| `max_blob_bytes` | Raw bytes in one selected Git blob |
+| `max_total_blob_bytes` | Total raw bytes of selected blobs |
+| `exclusions` | Explicit paths excluded by policy |
+
+The JSON output can be larger than the input-byte budget because it includes metadata and escaping. Source text is not silently cut off to make it fit.
+
+## Run a complete example
+
+Use the virtual environment and `peoplebot-source` checkout from [your first State](/guides/first-state). Save the following as `context_example.py` beside those two directories:
+
+```python
+import json
+import subprocess
+from peoplebot import ContextPolicy, StateRef, assemble_context
+
+repository = "https://github.com/peoplebot-framework/peoplebot-releases"
+commit = "14b15c8bfb0b4ce9f0d827fe018b42af04969945"
+checkout = "./peoplebot-source"
+policy_path = "config/context-retrieval-policy-v0.json"
+
+policy_bytes = subprocess.run(
+    ["git", "-C", checkout, "show", f"{commit}:{policy_path}"],
+    check=True, capture_output=True, timeout=15,
+).stdout
+policy = ContextPolicy.from_dict(
+    StateRef(repository, commit, policy_path),
+    json.loads(policy_bytes),
+)
+assembly = assemble_context(
+    checkout,
+    StateRef(repository, commit),
+    ("peoplebot/state.py",),
+    policy,
+)
+print(assembly.to_json_bytes().decode("utf-8"), end="")
+```
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe ./context_example.py
+```
+
+Linux:
+
+```bash
+./.venv/bin/python ./context_example.py
+```
+
+The JSON contains one document with the full text of `peoplebot/state.py` and its source identity, plus a manifest recording the selection policy. It should identify the same blob as the first-State example.
+
+This example loads the policy from its pinned Git blob. The general assembly API does not independently prove that a caller-supplied policy matches that blob; the project-review wrapper performs its own equality check.
+
+## Handle exclusions and unsupported content
+
+Inspect the manifest for exclusions rather than assuming every requested file reached the output. Oversized files may be excluded by policy. Selected invalid UTF-8, NUL-containing files, symlinks, or submodule gitlinks fail assembly unless excluded before content assembly. Symlink targets and submodule contents are not followed.
+
+Missing objects are not fetched automatically. Retrieve the intended source explicitly, then retry with the same exact State if that remains your intended input.
+
+## Public reference
+
+[Context assembly contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/context-assembly-v0.md), [Context preparation contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/context-preparation-v0.md).
