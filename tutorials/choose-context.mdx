@@ -1,0 +1,142 @@
+---
+title: "4. Choose what the assistant can see"
+description: "Try a small reading list and see why some files are left out."
+---
+
+**Goal:** see the difference between asking for a file and actually including it in a task's context. **AI calls:** none.
+
+**Context** means the information provided for a task. Think of it as a reading packet: the chosen pages and their saved versions. The exercise below builds that packet locally; it does not send it to an AI service.
+
+Use the practice project from the previous lessons and stay in the outer folder.
+
+## 1. Save the helper
+
+Create **`choose_context.py`** beside `practice-project`, using the plain-text editor method from lesson 3. Paste this entire code block:
+
+```python
+import argparse
+import json
+import subprocess
+from pathlib import Path
+from peoplebot import ContextPolicy, StateRef, assemble_context
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--limit", type=int, default=128)
+args = parser.parse_args()
+if args.limit not in (128, 4096):
+    parser.error("For this tutorial, choose --limit 128 or --limit 4096.")
+
+project = Path("practice-project")
+if not (project / ".git").exists():
+    raise SystemExit("Complete lesson 2 first; practice-project must be here.")
+
+
+def git(*arguments):
+    return subprocess.run(
+        ["git", "-C", str(project), *arguments],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=15,
+    ).stdout.strip()
+
+
+policy_path = "tutorial-context-policy.json"
+policy_data = {
+    "format": "peoplebot.context-policy.v0",
+    "max_entries": 4,
+    "max_blob_bytes": args.limit,
+    "max_total_blob_bytes": 8192,
+    "exclusions": [],
+}
+(project / "long-note.txt").write_text("x" * 2000, encoding="utf-8")
+(project / policy_path).write_text(
+    json.dumps(policy_data) + "\n", encoding="utf-8"
+)
+git("add", "long-note.txt", policy_path)
+if git("diff", "--cached", "--name-only", "--", "long-note.txt", policy_path):
+    git(
+        "-c", "user.name=PeopleBot Tutorial",
+        "-c", "user.email=tutorial@example.invalid",
+        "commit", "-m", f"Set tutorial file limit to {args.limit}",
+        "--", "long-note.txt", policy_path,
+    )
+
+commit = git("rev-parse", "HEAD")
+repository = "local:peoplebot-practice"
+policy = ContextPolicy.from_dict(
+    StateRef(repository, commit, policy_path), policy_data
+)
+requested = ("welcome.txt", "long-note.txt")
+assembly = assemble_context(
+    project, StateRef(repository, commit), requested, policy
+)
+included = {document.source.path for document in assembly.documents}
+print(f"Per-file limit: {args.limit} bytes")
+for path in requested:
+    print(f"{path}: {'INCLUDED' if path in included else 'LEFT OUT'}")
+```
+
+This helper adds two tutorial files and saves a new local snapshot when they change. `long-note.txt` is deliberately larger than the first limit. The policy file records the size rules. It does not overwrite your greeting or push anything to GitHub. Use it only in the practice project.
+
+## 2. Try the small reading limit
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe ./choose_context.py --limit 128
+```
+
+Linux:
+
+```bash
+./.venv/bin/python ./choose_context.py --limit 128
+```
+
+Expected result:
+
+```text
+Per-file limit: 128 bytes
+welcome.txt: INCLUDED
+long-note.txt: LEFT OUT
+```
+
+A **byte** is a unit of stored data. In these simple ASCII examples, each character takes one byte. The greeting fits within 128 bytes; the 2,000-character note does not. Other languages and characters can take more bytes per character.
+
+## 3. Allow the larger file
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe ./choose_context.py --limit 4096
+```
+
+Linux:
+
+```bash
+./.venv/bin/python ./choose_context.py --limit 4096
+```
+
+Expected result:
+
+```text
+Per-file limit: 4096 bytes
+welcome.txt: INCLUDED
+long-note.txt: INCLUDED
+```
+
+You changed the rule deliberately and saved it in another snapshot. In a real task, you would first ask whether the larger file is relevant, rather than always increasing the limit.
+
+## What this teaches
+
+Requesting a file is not a guarantee that it reaches the final reading packet. Inspect what was included and why other items were excluded. The full API result includes a **manifest**: a list describing those decisions. This helper prints a simpler summary for the exercise.
+
+The operation reads committed text. It does not ask a model to decide which files matter. If you return to lesson 3 now, “Previous” will mean the prior policy snapshot, not the original greeting snapshot; moving labels change as you save more commits.
+
+## If you get stuck
+
+- **The greeting is missing:** check that `welcome.txt` was committed in lesson 2.
+- **Both files are left out:** check you copied the exact policy and did not enlarge the greeting.
+- **An error names a missing package:** use the `.venv` Python command, not an unrelated Python installation.
+
+Next: [write a task that another person or agent can understand](/tutorials/write-a-task). For the complete technical explanation, see [context selection](/guides/context).

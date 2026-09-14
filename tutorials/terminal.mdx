@@ -1,0 +1,84 @@
+---
+title: "1. Get comfortable with the terminal"
+description: "Know where to type commands and how to return to the right folder."
+---
+
+**Goal:** prepare for the practice exercises. This lesson assumes no experience with command-line tools.
+
+## 1. Open the right kind of window
+
+On **Windows**, open PowerShell from the Start menu. On **Ubuntu or another Linux desktop**, open the Terminal application.
+
+A line such as `PS C:\Users\You>` or `you@computer:~$` is the prompt: the computer is ready for your next instruction. Do not copy the prompt itself. Paste the command, then press Enter.
+
+Use only the block labeled for your operating system. When a block contains several commands, run them one line at a time and check the result before continuing.
+
+## 2. Check Python and Git
+
+Python runs PeopleBot. Git keeps the file history.
+
+Windows PowerShell:
+
+```powershell
+python --version
+git --version
+```
+
+Linux:
+
+```bash
+python3 --version
+git --version
+```
+
+You should see version numbers. The public package requires **Python 3.11 or newer** and **Git 2.45 or newer**. For example, Python 3.12 and Git 2.51 meet those minimums.
+
+If a command is not found, install the missing tool from the official [Python downloads](https://www.python.org/downloads/) or [Git downloads](https://git-scm.com/downloads/) page. Follow the instructions for your operating system, then reopen your terminal and check again. Stop here if the version requirements are not met.
+
+## 3. Install PeopleBot in one folder
+
+If you have already followed [installation](/guides/install), keep the folder you used there. Otherwise, make a folder called `PeopleBot-Lab`, download the four release assets into it, and follow that guide.
+
+The guide creates a folder called `.venv`. Think of this as a separate toolbox for the tutorial's Python software. It avoids mixing the package with other Python projects. It is not a separate computer or a security boundary. [Python's explanation of virtual environments](https://docs.python.org/3/library/venv.html)
+
+All subsequent lesson commands start in the folder containing `.venv`. On Windows, use File Explorer to open that folder, click the address bar, type `powershell`, and press Enter. On Linux, use your file manager's **Open in Terminal** action if available, or change to the folder with `cd` followed by its quoted full path.
+
+If you use `cd`, replace the example path below with the path to your actual folder:
+
+```text
+cd "FULL PATH TO YOUR TUTORIAL FOLDER"
+```
+
+The quotation marks matter when a folder name includes spaces. `cd` changes where commands run; it does not move your files.
+
+## 4. Confirm that you are in the right place
+
+Windows PowerShell:
+
+```powershell
+Get-Location
+Test-Path .\.venv\Scripts\python.exe
+.\.venv\Scripts\python.exe -m peoplebot --help
+```
+
+`Test-Path` should return `True`. The final command should show PeopleBot's help.
+
+Linux:
+
+```bash
+pwd
+ls ./.venv/bin/python
+./.venv/bin/python -m peoplebot --help
+```
+
+`ls` should display the Python path rather than “No such file or directory.” The final command should show PeopleBot's help.
+
+Here, `.` means “this folder.” The longer Python path tells the computer to use the tutorial's toolbox. You do not need to run an activation script.
+
+## If you get stuck
+
+- **The `.venv` Python cannot be found:** you may be in the wrong folder, or virtual-environment creation did not finish.
+- **“No module named peoplebot”:** the package was not installed in the Python environment you are using. Return to the installation commands.
+- **The terminal closes:** reopen the same tutorial folder and continue from there. Your saved files remain.
+
+You are ready when `--help` lists `resolve-state`, `alpha-setup`, `alpha-adopt`, and `alpha-resume`. Next: [save two versions of a file](/tutorials/snapshots).

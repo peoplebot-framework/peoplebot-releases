@@ -3,9 +3,11 @@ title: "PeopleBot"
 description: "Understand the framework, install the public release, and try a real local example."
 ---
 
-PeopleBot is a Git-native framework for agent work that can be saved, inspected, and continued. It gives tasks an exact record of the source they used and the results they produced. The design keeps reusable agent behavior separate from each agent's identity, memory, and runtime.
+PeopleBot helps keep track of an AI assistant's work: the exact files it used, what it tried, and what it saved for later. Its goal is to make work easier to inspect and continue across sessions.
 
-The practical goal is to let agents work across sessions and environments without relying on one growing conversation. Git stores known state; model invocations handle tasks that require inference.
+It uses **Git**, a tool that saves versions of files. You do not need to understand all of Git to begin. Our tutorials start with one text file and explain each new term as it appears.
+
+**New here? [Start the beginner learning path](/tutorials/start).** You will save two versions of a file, inspect them with PeopleBot, and choose which information goes into a task.
 
 <Note>
 These guides describe the public **0.1.0a3 experimental framework release**. It includes deterministic utilities and a bounded project-review adapter. Installing it does not start an autonomous worker. See the [capability table](/guides/capabilities) for the release boundary.
@@ -15,7 +17,8 @@ These guides describe the public **0.1.0a3 experimental framework release**. It 
 
 | Your goal | Start here |
 | --- | --- |
-| Understand the idea | [Five core concepts](/guides/concepts) |
+| I am completely new | [Beginner tutorials](/tutorials/start) |
+| Understand the idea | [PeopleBot in plain English](/guides/concepts) |
 | Install the public utilities | [Installation](/guides/install) |
 | Run something useful without a model account | [Resolve your first State](/guides/first-state) |
 | Supply exact files to an agent | [Context selection](/guides/context) |

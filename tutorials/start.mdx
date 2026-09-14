@@ -1,0 +1,47 @@
+---
+title: "New to PeopleBot? Start here"
+description: "A plain-language introduction and a step-by-step learning path."
+---
+
+You do not need to understand the whole framework before trying it. Start with a file you can recognize, save a version of it, and ask PeopleBot to find that exact version again.
+
+## What problem is PeopleBot trying to solve?
+
+Imagine giving an assistant a project today and returning next week. You want it to know which files it used, what happened, and what remains to be done. You also want another assistant to be able to check its work.
+
+PeopleBot's design puts that information in records you can save and inspect. Git keeps the saved versions; PeopleBot helps identify and organize the inputs and results of an agent's work.
+
+**An agent** is an AI assistant configured to do a particular kind of task. PeopleBot is the framework around that work. It is not itself an AI model.
+
+<Note>
+The public version covered here is **0.1.0a3**, an early experimental release. These beginner exercises work with local files and need no AI subscription or model call. The package does not yet provide an unattended coding team. Installing it does not start an agent.
+</Note>
+
+## Follow this learning path
+
+| Lesson | What you will learn | What you will have afterward |
+| --- | --- | --- |
+| [1. Get comfortable with the terminal](/tutorials/terminal) | Where commands go and how to check your tools | A working starting point |
+| [2. Save two versions of a file](/tutorials/snapshots) | What Git means by a saved snapshot | A small practice project with two versions |
+| [3. Let PeopleBot identify your file](/tutorials/read-your-file) | How PeopleBot names an exact saved version | Readable results for both versions |
+| [4. Choose what the assistant can see](/tutorials/choose-context) | What context means and why size limits matter | A demonstration of selected and excluded information |
+| [5. Write a clear task](/tutorials/write-a-task) | How to explain the job and judge its result | A task brief ready for a future review |
+
+The hands-on lessons build on one another. Keep using the same tutorial folder. You can close your terminal and return later; the [terminal lesson](/tutorials/terminal) explains how to reopen the right folder.
+
+## A few words you will see
+
+| Word | Plain-language meaning |
+| --- | --- |
+| Terminal | A window where you type instructions for your computer |
+| Command | One instruction entered in that window |
+| Repository, or repo | A project folder whose history Git tracks |
+| Commit | A saved snapshot of tracked files, with an identifying code |
+| Checkout | The local copy of a Git project you are working with |
+| State | PeopleBot's reference to an exact repository snapshot, sometimes one file inside it |
+| Context | The information provided for a task |
+| Blueprint | Reusable instructions for a kind of agent |
+| Instance | One particular agent with its own identity |
+| Execution | One attempt at a task |
+
+For now, focus on **a folder, a file, and a saved version**. The other concepts will make more sense after you have seen those work.
