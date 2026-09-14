@@ -1,0 +1,67 @@
+---
+title: "5. Write a task someone can finish"
+description: "Explain the goal, relevant information, and what counts as success."
+---
+
+**Goal:** write a clear task brief. You can do this lesson without running commands.
+
+A good task makes it possible to tell whether the work is finished. “Look over my project” leaves many questions open. “Check whether the greeting file matches this requirement and report the mismatch” gives the reviewer a specific job.
+
+## 1. Say what you want to know
+
+For the practice project, imagine the required greeting is exactly “Hello from PeopleBot.” Your current saved greeting is different. The job is to check that mismatch and explain it.
+
+## 2. Provide the information needed
+
+Use the full commit code shown by Git or the earlier tutorial. A **full commit ID** identifies the saved version. A path identifies a file within it.
+
+You can get the current full code with:
+
+```bash
+git -C practice-project rev-parse HEAD
+```
+
+If a reviewer needs a written requirement, make that requirement part of the supplied task material. Do not expect it to know an earlier conversation it has not received.
+
+## 3. Write the brief
+
+Here is a complete example. Replace the bracketed commit instruction with the real full code from your project before using it:
+
+```text
+Goal: Check whether welcome.txt matches the required greeting.
+
+Project: The local practice-project repository.
+Version to inspect: [paste the full commit ID here]
+File to inspect: welcome.txt
+Requirement: The greeting must be exactly "Hello from PeopleBot."
+
+Please report:
+- Whether the saved file matches the requirement.
+- The text actually found in the file.
+- The exact commit and file you inspected.
+- Any missing information that prevents an answer.
+
+Allowed work: Read the supplied material and report your finding.
+Do not change files or publish anything.
+Stop after this one check.
+```
+
+This is a human-readable task brief, not a PeopleBot configuration file. The 0.1.0a3 review adapter still needs the [explicit runtime setup and context bindings](/guides/project-review). Pasting this text alone does not start it.
+
+## 4. Practice judging the answer
+
+| Response | How to interpret it |
+| --- | --- |
+| “Everything looks good.” | Too vague; it does not identify the file, version, or comparison |
+| “The saved file says ‘Hello from the updated project.’, which differs from the requirement,” with the correct commit and path | A checkable finding |
+| “I cannot see welcome.txt at the requested commit.” | Missing evidence; supply the file or correct the reference |
+
+A confidently worded answer is not a substitute for checking the cited material. You can verify this example yourself with `git show` from lesson 2.
+
+## 5. Decide the next task separately
+
+A review and a correction are different jobs. If you want the greeting changed afterward, specify that change and how to verify it. A review request does not automatically authorize edits or publication.
+
+For a larger project, use the same pattern: goal, exact inputs, expected result, allowed actions, and stopping point. Keep the first task small enough that you can recognize success.
+
+You have completed the beginner path. Continue with [project reviews](/guides/project-review), [memory and recovery](/guides/memory), or [troubleshooting](/guides/troubleshooting) as needed.

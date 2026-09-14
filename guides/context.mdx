@@ -3,6 +3,8 @@ title: "Select context"
 description: "Retrieve only the committed text needed for a task, with explicit size limits."
 ---
 
+Context is the reading packet for a task. This page explains how to select its files and limit its size. For a guided first attempt with simple output, try [choose what the assistant can see](/tutorials/choose-context).
+
 **Release:** 0.1.0a3. **Model calls:** none. This is a Python API, not a separate CLI command.
 
 Context assembly takes an exact repository State, selected paths, and a policy. It reads file contents from Git objects and returns those contents together with their provenance. It does not search a project to decide what matters.

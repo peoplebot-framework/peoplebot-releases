@@ -17,6 +17,17 @@
         ]
       },
       {
+        "group": "Beginner tutorials",
+        "pages": [
+          "tutorials/start",
+          "tutorials/terminal",
+          "tutorials/snapshots",
+          "tutorials/read-your-file",
+          "tutorials/choose-context",
+          "tutorials/write-a-task"
+        ]
+      },
+      {
         "group": "How PeopleBot works",
         "pages": [
           "guides/concepts",

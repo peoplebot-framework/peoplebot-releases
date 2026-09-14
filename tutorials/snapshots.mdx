@@ -1,0 +1,101 @@
+---
+title: "2. Save two versions of a file"
+description: "Learn what a Git snapshot means using an ordinary text file."
+---
+
+**Goal:** save an original greeting, change it, and see both versions. **AI calls:** none.
+
+Start in the tutorial folder containing `.venv`, as described in [lesson 1](/tutorials/terminal). Use a fresh folder name `practice-project`; if it already contains earlier work, use that existing exercise or choose a separate tutorial folder. Do not run this over an unrelated project.
+
+## 1. Create the practice project
+
+Run this on either operating system:
+
+```bash
+git init -b main practice-project
+```
+
+This creates a folder and tells Git to track its history. It does not upload anything or create a GitHub repository. **Git** is the local history tool; **GitHub** is an online service where repositories can be shared.
+
+## 2. Put a greeting in a file
+
+Windows PowerShell:
+
+```powershell
+Set-Content -Path practice-project/welcome.txt -Value "Hello from PeopleBot." -Encoding ascii -NoNewline
+Get-Content practice-project/welcome.txt
+```
+
+Linux:
+
+```bash
+printf 'Hello from PeopleBot.' > practice-project/welcome.txt
+cat practice-project/welcome.txt
+```
+
+You should see `Hello from PeopleBot.` The greeting has no final line break, so your next terminal prompt may appear immediately after it. That is expected.
+
+## 3. Save the first snapshot
+
+Run these commands on either operating system:
+
+```bash
+git -C practice-project add welcome.txt
+git -C practice-project -c user.name="PeopleBot Tutorial" -c user.email="tutorial@example.invalid" commit -m "Save the original greeting"
+```
+
+`add` selects the file for the next snapshot. `commit` saves that snapshot. The example name and email label this local tutorial commit only; they do not change your global Git identity or send email.
+
+`-C practice-project` tells Git which folder to use, so you can stay in the tutorial's outer folder throughout the exercise.
+
+## 4. Change the file without saving another snapshot yet
+
+Windows PowerShell:
+
+```powershell
+Set-Content -Path practice-project/welcome.txt -Value "Hello from the updated project." -Encoding ascii -NoNewline
+```
+
+Linux:
+
+```bash
+printf 'Hello from the updated project.' > practice-project/welcome.txt
+```
+
+Now compare the saved version with your edited file:
+
+```bash
+git -C practice-project show HEAD:welcome.txt
+git -C practice-project diff -- welcome.txt
+```
+
+The first command still shows `Hello from PeopleBot.` Here, `HEAD` means the currently selected commit. The second command shows the change: a minus line for the old text and a plus line for the new text. Those signs are part of the comparison, not part of your file.
+
+**The important idea:** editing a file and saving a Git snapshot are two different actions.
+
+## 5. Save the second snapshot
+
+```bash
+git -C practice-project add welcome.txt
+git -C practice-project -c user.name="PeopleBot Tutorial" -c user.email="tutorial@example.invalid" commit -m "Save the updated greeting"
+git -C practice-project log --oneline -2
+```
+
+You should see two entries, newest first. Each begins with a short identifying code. Your codes will differ from anyone else's, which is normal.
+
+To read each version:
+
+```bash
+git -C practice-project show HEAD:welcome.txt
+git -C practice-project show HEAD~1:welcome.txt
+```
+
+The first prints the updated greeting. The second prints the original greeting; `HEAD~1` selects the previous commit. Neither command changes your files.
+
+## If you get stuck
+
+- **“Nothing to commit”:** the file may already be saved. Use the two `show` commands to inspect the versions you have.
+- **“Not a git repository”:** check you are still in the outer tutorial folder and `practice-project` exists there.
+- **`HEAD~1` does not exist:** you have not yet completed both commits.
+
+You now have a small history to inspect. Next: [let PeopleBot identify your file](/tutorials/read-your-file).

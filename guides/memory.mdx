@@ -3,6 +3,8 @@ title: "Memory and recovery"
 description: "Distinguish a saved checkpoint, remote synchronization, and continuation."
 ---
 
+Think of memory as a small notebook saved for the next work session. This page explains the difference between writing the notebook, sharing a copy, and reading it later. In the technical sections, a **checkpoint** means one saved version of that notebook.
+
 **Release:** 0.1.0a3. Mutation wrappers use the Windows admission/provenance path. These are experimental Python APIs.
 
 PeopleBot memory is selected text committed to Git for one Instance. It is not a hidden model state or a complete chat transcript. A later execution retrieves the specific saved items it needs from an exact memory commit.

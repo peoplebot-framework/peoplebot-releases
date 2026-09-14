@@ -1,0 +1,84 @@
+---
+title: "3. Let PeopleBot identify your file"
+description: "See how a saved Git version becomes an exact PeopleBot State."
+---
+
+**Goal:** have PeopleBot identify both versions of your greeting and show their contents. **AI calls:** none.
+
+Finish [lesson 2](/tutorials/snapshots) first. Keep using the outer tutorial folder containing `.venv` and `practice-project`.
+
+## 1. Save a small helper
+
+Open a plain-text editor, such as Notepad on Windows or Text Editor on Ubuntu. Create a new file and paste the complete code below. Save it in the outer tutorial folder as **`inspect_greeting.py`**.
+
+On Windows, select **All files** in Notepad's Save dialog so the filename does not become `inspect_greeting.py.txt`. This is a Python file, not a Word document. You do not need to understand every line before running it.
+
+```python
+import subprocess
+from peoplebot import StateRef, resolve_state
+
+checkout = "practice-project"
+repository = "local:peoplebot-practice"
+
+
+def git(*arguments):
+    return subprocess.run(
+        ["git", "-C", checkout, *arguments],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=15,
+    ).stdout.strip()
+
+
+for label, saved_version in (("Latest", "HEAD"), ("Previous", "HEAD~1")):
+    commit = git("rev-parse", saved_version)
+    reference = StateRef(repository, commit, "welcome.txt")
+    result = resolve_state(checkout, reference)
+    print(f"{label} saved version")
+    print(f"  Full commit: {reference.commit}")
+    print(f"  File: {reference.path}")
+    print(f"  Object type: {result.selected_type}")
+    print(f"  Contents: {git('show', commit + ':welcome.txt')}")
+    print()
+```
+
+The helper uses Git to turn “latest” and “previous” into full commit IDs. It then passes those exact IDs to PeopleBot. Git reads the displayed text; PeopleBot verifies which committed object the reference selects.
+
+`local:peoplebot-practice` is the label we have chosen for this local repository. It is not a web address, password, or instruction to upload the project.
+
+## 2. Run it
+
+Windows PowerShell:
+
+```powershell
+.\.venv\Scripts\python.exe ./inspect_greeting.py
+```
+
+Linux:
+
+```bash
+./.venv/bin/python ./inspect_greeting.py
+```
+
+## 3. Check the result
+
+You should see two sections:
+
+| Section | Contents | Object type |
+| --- | --- | --- |
+| Latest saved version | `Hello from the updated project.` | `blob` |
+| Previous saved version | `Hello from PeopleBot.` | `blob` |
+
+A `blob` is Git's term for a stored file's contents. The full commit codes will be long and different from one another. You do not need to memorize them; software records and reuses them.
+
+A PeopleBot State reference answers three questions: **which repository, which saved version, and optionally which file?** This is more precise than “use the latest file,” which can mean something different tomorrow.
+
+## If you get stuck
+
+- **Python cannot open the helper:** check its name and that it is beside `practice-project`, not inside it.
+- **Python reports a syntax error:** compare the saved code with the complete block, including indentation.
+- **The previous version cannot be found:** complete both commits in lesson 2.
+- **“No module named peoplebot”:** use the virtual environment's Python shown above.
+
+You have now used PeopleBot on your own local project. Next: [choose what information reaches a task](/tutorials/choose-context).
