@@ -1,0 +1,57 @@
+---
+title: "Troubleshooting"
+description: "Identify the failed layer and take the smallest useful next step."
+---
+
+Start with the exact command, package version, operating system, and reported error code. Keep the source commit and relevant artifact references. Remove credentials and unrelated private context before sharing a report.
+
+## Installation and local State
+
+| Symptom or code | What to check |
+| --- | --- |
+| Python cannot be found | Install Python 3.11 or newer, then use its actual executable |
+| `No module named peoplebot` | Run the virtual environment's Python; confirm the wheel was installed into that environment |
+| Virtual environment creation fails | Check that your Python installation includes venv support and the destination is writable |
+| Checksum does not match | Stop installation; download the correct asset from the same release and verify again |
+| `git.unavailable` | Confirm Git is installed and available to the process |
+| `git.unsupported` | Use Git 2.45 or newer with the required no-lazy-fetch support |
+| `repository.unavailable` | Check the local checkout directory exists |
+| `repository.invalid` | Confirm the specified directory is a Git repository |
+| `state.commit_unavailable` | Obtain the exact commit explicitly; shallow clones may not contain it |
+| `state.path_unavailable` | Check spelling and case at that commit, not just in the working tree |
+| `input.invalid` | Use a full lowercase commit ID and canonical relative paths |
+
+The published code resolves local objects only. A repository URL in `--repository` is not a download instruction.
+
+## Context selection
+
+| Problem | Next step |
+| --- | --- |
+| Requested content is excluded | Inspect the manifest's policy reason and narrow the selection or deliberately adjust the policy |
+| `context.encoding_unsupported` | Select supported UTF-8 source text |
+| `context.nul_unsupported` | Exclude binary or NUL-containing content |
+| `context.symlink_unsupported` | Select the intended regular committed file instead of a symlink |
+| `context.gitlink_unsupported` | Supply separately pinned submodule material through an appropriate supported source; assembly does not traverse it |
+| Missing context object | Ensure the required object exists locally before rerunning |
+
+## Review and execution
+
+An `insufficient_evidence` review is a valid outcome. Add the missing material or narrow the objective before defining another attempt.
+
+The 0.1.0a3 adapter checks a specific CLI version and protocol. Confirm the configured and installed versions agree. A protocol failure is not evidence of a Windows scheduling failure.
+
+If the Instance is already running, inspect its existing execution. Do not clear its lock merely to get another attempt started. The Windows file lock and the saved execution record answer different questions: whether another local execution owns admission, and what task outcome was durably recorded.
+
+If a start record exists without a terminal record, or the result reports incomplete persistence, inspect known work and artifact references before repeating an operation. A reporting failure can occur after useful work was completed.
+
+## Memory and remote transport
+
+A local checkpoint is not a remote backup. Confirm the synchronization result establishes the intended remote State. An uncertain transport outcome requires inspection and reconciliation; repeatedly pushing or rerunning a model does not resolve the uncertainty by itself.
+
+## A useful issue report
+
+Include the release version, OS, Python/Git versions, exact relevant commit, minimal command or API call with sensitive values removed, error code, and the expected versus observed result. For review issues, include which context was selected and whether the result was an adapter observation or durably saved evidence.
+
+## Public reference
+
+[State errors](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/peoplebot/state.py), [Context errors](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/context-assembly-v0.md), [Execution provenance](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/execution-provenance-v0.md).

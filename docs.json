@@ -12,13 +12,32 @@
         "pages": [
           "index",
           "guides/install",
+          "guides/first-state",
           "guides/capabilities"
         ]
       },
       {
-        "group": "Understand PeopleBot",
+        "group": "How PeopleBot works",
         "pages": [
-          "guides/concepts"
+          "guides/concepts",
+          "guides/environments",
+          "guides/context"
+        ]
+      },
+      {
+        "group": "Agent work",
+        "pages": [
+          "guides/project-review",
+          "guides/memory",
+          "guides/coordination"
+        ]
+      },
+      {
+        "group": "Reference and help",
+        "pages": [
+          "reference/cli",
+          "guides/troubleshooting",
+          "reference/releases"
         ]
       }
     ]

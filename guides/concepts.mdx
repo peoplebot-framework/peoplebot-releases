@@ -30,3 +30,15 @@ The design gives each environment its own outbound message repository. The owner
 Message transport is an architectural concept in **0.1.0a3**, not an implemented messaging service in that release. See [release capabilities](/guides/capabilities).
 
 Source: the public [framework overview](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/README.package.md) and [state/execution contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/state-execution-v0.md).
+
+## A worked example
+
+Suppose you want a parser reviewed. The Blueprint describes how the reviewer behaves. Your environment owns a reviewer Instance. You select the parser and its requirements at an exact State. One Execution receives that scope and records an outcome. In the messaging design, another actor could receive a Message referring to that result; the public 0.1.0a3 package does not deliver that message.
+
+A second execution can use selected Instance memory from an earlier checkpoint. It has a new execution identity and fresh supplied context, while retaining exact references to the earlier work. This is how durable records can support continuity without preserving a model process.
+
+## Behavior, memory, and procedure
+
+A Blueprint describes reusable behavior. Instance memory contains that actor's selected context. A learned procedure is task-specific reusable knowledge represented as State. The architecture allows procedure lineages, but automatic discovery and learning are not implemented in this public release.
+
+See [environment setup](/guides/environments), [memory and recovery](/guides/memory), and [the coordination design](/guides/coordination) for the boundaries between these responsibilities.

@@ -1,0 +1,54 @@
+---
+title: "Memory and recovery"
+description: "Distinguish a saved checkpoint, remote synchronization, and continuation."
+---
+
+**Release:** 0.1.0a3. Mutation wrappers use the Windows admission/provenance path. These are experimental Python APIs.
+
+PeopleBot memory is selected text committed to Git for one Instance. It is not a hidden model state or a complete chat transcript. A later execution retrieves the specific saved items it needs from an exact memory commit.
+
+## What to save
+
+Useful memory can include a current task checkpoint, a decision with its source, a verified procedure, or a concise list of unresolved work. Supply the intended text explicitly. The framework does not scan files, choose what matters, or summarize a conversation on your behalf.
+
+| Item | Example |
+| --- | --- |
+| Task checkpoint | Implemented the parser change; its review is still pending |
+| Decision | Use the specified input format; cite the requirements commit |
+| Procedure | Exact commands that verified a particular behavior |
+| Open question | Which requirement should govern an ambiguous input? |
+
+An agent's runtime memory and a project's published user documentation have different purposes. Saving a checkpoint does not require that agent to rewrite a user guide.
+
+## Four separate operations
+
+| Operation | Entry point | What it establishes |
+| --- | --- | --- |
+| Save selected text | `run_instance_memory_execution` | A local checkpoint at an exact State |
+| Retrieve selected items | `assemble_instance_memory_context` | Content from the specified saved commit |
+| Publish to the configured remote | `run_memory_synchronization_execution` | Explicit transport evidence, including whether the remote State was verified |
+| Recover authorized memory | `run_memory_recovery_execution` | An explicit recovery result from the configured memory ref |
+
+A successful review does not imply that memory was saved. A saved checkpoint does not imply that it was pushed. Pushing framework code does not synchronize an Instance's memory.
+
+## Checkpoint inputs and limits
+
+The save request binds the repository, environment, Instance, adopted Blueprint, expected prior State, explicit items, timestamp, and whether this is initial creation. An initial save requires an absent destination ref. Subsequent saves name the exact prior memory State.
+
+The memory format allows 64 items, at most 65,536 UTF-8 bytes per item, and at most 262,144 bytes total. Paths are canonical relative paths; NUL content is rejected. Equivalent content reuses the existing checkpoint and reports `changed=false`.
+
+The discovery ref identifies where an Instance's latest memory lives. A full commit identifies the particular checkpoint you intend to read, even after that ref advances.
+
+## Read failures accurately
+
+Memory publication and terminal execution evidence are separate writes. A checkpoint may be saved even if a later evidence write fails. Inspect the returned checkpoint or partial-State reference before repeating work.
+
+A start record without terminal evidence means the attempt is incomplete in the evidence store. It does not prove that the task never ran. Likewise, an uncertain remote push is not a confirmed failure. Inspect and reconcile the known State before deciding on another write.
+
+## Implementation example
+
+The public `checkpoint_and_resume` example shows the required request objects and returns both the checkpoint result and retrieved bytes. It is a callable example requiring configured inputs; importing it does not create an environment or perform work.
+
+## Public reference
+
+[Checkpoint/resume example](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/examples/instance_memory_checkpoint.py), [Memory contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/instance-memory-v0.md), [Synchronization and recovery contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/instance-memory-synchronization-v0.md).
