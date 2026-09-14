@@ -1,0 +1,82 @@
+---
+title: "Install PeopleBot 0.1.0a3"
+description: "Install the public package and verify that its CLI loads."
+---
+
+This procedure installs the experimental utilities. It does not invoke a model or start an agent.
+
+## Prerequisites
+
+- Python 3.11 or newer with pip and virtual-environment support.
+- Git 2.45 or newer for Git-backed operations.
+- Windows for the v0 Instance-admission and execution paths. The Linux commands below cover package installation and CLI help only.
+
+## Download and verify
+
+Download all four assets from the [0.1.0a3 release](https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a3) into one directory:
+
+- `peoplebot-0.1.0a3-py3-none-any.whl`
+- `peoplebot-0.1.0a3.tar.gz`
+- `peoplebot-0.1.0a3-public-provenance.json`
+- `SHA256SUMS`
+
+Open a terminal in that directory. Verify the checksum file itself against the release's published SHA-256:
+
+```text
+d628d1d83d41c551191e354fd6b0c4d20d17c1bbf10ec72e53def7360d01024f
+```
+
+On Windows PowerShell:
+
+```powershell
+Get-FileHash .\SHA256SUMS -Algorithm SHA256
+Get-FileHash .\peoplebot-0.1.0a3-py3-none-any.whl -Algorithm SHA256
+Get-FileHash .\peoplebot-0.1.0a3.tar.gz -Algorithm SHA256
+Get-FileHash .\peoplebot-0.1.0a3-public-provenance.json -Algorithm SHA256
+Get-Content .\SHA256SUMS
+```
+
+Compare the first hash with the value above, then compare each remaining hash with its filename's entry in `SHA256SUMS`. Letter case does not matter. Continue only if all four match.
+
+On Linux:
+
+```bash
+sha256sum SHA256SUMS
+sha256sum -c SHA256SUMS
+```
+
+The first hash must match the value above, and the second command must report `OK` for all three entries.
+
+## Install in a virtual environment
+
+On Windows PowerShell, using an installed Python 3.11-or-newer interpreter:
+
+```powershell
+python --version
+git --version
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install --no-deps .\peoplebot-0.1.0a3-py3-none-any.whl
+.\.venv\Scripts\python.exe -m peoplebot --help
+```
+
+On Linux, using an installed Python 3.11-or-newer interpreter:
+
+```bash
+python3 --version
+git --version
+python3 -m venv .venv
+./.venv/bin/python -m pip install --no-deps ./peoplebot-0.1.0a3-py3-none-any.whl
+./.venv/bin/python -m peoplebot --help
+```
+
+No shell activation is needed because these commands use the virtual environment's Python directly.
+
+## Expected result
+
+The help output lists `resolve-state`, `alpha-setup`, `alpha-adopt`, and `alpha-resume`. The alpha commands exercise synthetic setup/adoption mechanics; their names do not mean they bootstrap a production agent.
+
+Keep the matching source archive and provenance with the installed wheel. Read [release capabilities](/guides/capabilities) before attempting an execution.
+
+If Python, Git, or virtual-environment creation is unavailable, install the missing prerequisite before continuing. If the package cannot be imported, confirm you are running the virtual environment's Python shown above.
+
+Source: public [adoption instructions](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/releases/0.1.0a3/ADOPTION.md) and [CLI implementation](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/peoplebot/__main__.py).

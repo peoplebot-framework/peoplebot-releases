@@ -1,0 +1,32 @@
+---
+title: "Five core concepts"
+description: "Blueprint, Instance, State, Message, and Execution."
+---
+
+PeopleBot's architecture has five core primitives.
+
+| Concept | Meaning | Example |
+| --- | --- | --- |
+| Blueprint | Versioned, reusable agent behavior and configuration | A project-review definition |
+| Instance | One concrete actor owned by an environment | Your project's reviewer |
+| State | An exact repository commit, optionally narrowed to a path | The source files selected for a review |
+| Message | A small actionable record referring to exact state or results | A request to review a particular commit |
+| Execution | One bounded work attempt with recorded inputs and an outcome | One review invocation |
+
+An **environment** owns its identities, repositories, runtime, and credentials. An **adapter** connects an execution to a particular runtime. These support the five primitives.
+
+## Why exact commits matter
+
+A branch can move as work continues. A full commit ID identifies the particular snapshot a task used. Keeping that reference makes it possible to retrieve the same inputs later and distinguish two reviews of different code.
+
+## Memory and execution history
+
+An execution record describes an attempt and its outcome. Instance memory stores selected material for future work. Saving memory locally, synchronizing it remotely, and recovering it are separate operations.
+
+## Messaging architecture
+
+The design gives each environment its own outbound message repository. The owner publishes there; authorized peers read it and publish replies from their own repositories. Access is managed through Git hosting permissions.
+
+Message transport is an architectural concept in **0.1.0a3**, not an implemented messaging service in that release. See [release capabilities](/guides/capabilities).
+
+Source: the public [framework overview](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/README.package.md) and [state/execution contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/state-execution-v0.md).

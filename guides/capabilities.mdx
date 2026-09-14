@@ -1,0 +1,31 @@
+---
+title: "Release capabilities"
+description: "What the public 0.1.0a3 package includes and what still needs verification."
+---
+
+This page describes **0.1.0a3**, verified against its public source and [published release record](https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a3). It does not describe unreleased development work.
+
+| Capability | Status in this release |
+| --- | --- |
+| Resolve exact Git State references | Implemented utility |
+| Select and assemble bounded context from pinned Git objects | Implemented utility |
+| Execution admission and provenance | Implemented; admission is Windows-specific |
+| Instance-memory checkpoint, explicit synchronization, and recovery | Implemented experimental APIs; separate operations |
+| Bounded project-review Blueprint and Codex adapter | Included; the release record reports no live CLI/model acceptance check |
+| Message publication, reading, and replies | Not implemented |
+| Scheduled autonomous development | Not implemented |
+| General agent migration, automatic learning, or user interface | Not implemented |
+
+## What installation establishes
+
+Installation makes the package and CLI available. It does not create an Instance, configure credentials, start a model, or establish a running workflow.
+
+The project-review adapter requires explicit environment and Instance identities, a pinned project snapshot, context selection and policy, runtime/authentication setup, and an evidence destination. Memory operations require their own bindings.
+
+The published adapter is configured for Codex CLI 0.153.4 and model `gpt-5.6-luna`. These are release-specific settings, not a claim of compatibility with whatever CLI or model is currently installed.
+
+## How to interpret review results
+
+A review can return findings, no findings, or insufficient evidence. A valid response format does not establish that the review is correct or complete. Its scope is the supplied context.
+
+See the public [adoption requirements](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/releases/0.1.0a3/ADOPTION.md) and [project-review contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/project-review-v0.md).

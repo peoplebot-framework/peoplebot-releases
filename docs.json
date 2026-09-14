@@ -1,0 +1,26 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "PeopleBot",
+  "colors": {
+    "primary": "#2563EB"
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Start here",
+        "pages": [
+          "index",
+          "guides/install",
+          "guides/capabilities"
+        ]
+      },
+      {
+        "group": "Understand PeopleBot",
+        "pages": [
+          "guides/concepts"
+        ]
+      }
+    ]
+  }
+}

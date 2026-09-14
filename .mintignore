@@ -1,0 +1,10 @@
+# Publish the curated MDX guides; retain distribution files on GitHub.
+/docs/
+/releases/
+/peoplebot/
+/tests/
+/config/
+/*.md
+/LICENSE
+/MANIFEST.in
+/pyproject.toml
