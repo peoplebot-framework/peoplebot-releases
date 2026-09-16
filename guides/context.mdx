@@ -5,7 +5,7 @@ description: "Retrieve only the committed text needed for a task, with explicit 
 
 Context is the reading packet for a task. This page explains how to select its files and limit its size. For a guided first attempt with simple output, try [choose what the assistant can see](/tutorials/choose-context).
 
-**Release:** 0.1.0a3. **Model calls:** none. This is a Python API, not a separate CLI command.
+**Release:** 0.1.0a4. **Model calls:** none. This is a Python API, not a separate CLI command.
 
 Context assembly takes an exact repository State, selected paths, and a policy. It reads file contents from Git objects and returns those contents together with their provenance. It does not search a project to decide what matters.
 
@@ -32,7 +32,7 @@ import subprocess
 from peoplebot import ContextPolicy, StateRef, assemble_context
 
 repository = "https://github.com/peoplebot-framework/peoplebot-releases"
-commit = "14b15c8bfb0b4ce9f0d827fe018b42af04969945"
+commit = "<public-distribution-commit>"
 checkout = "./peoplebot-source"
 policy_path = "config/context-retrieval-policy-v0.json"
 
@@ -77,4 +77,4 @@ Missing objects are not fetched automatically. Retrieve the intended source expl
 
 ## Public reference
 
-[Context assembly contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/context-assembly-v0.md), [Context preparation contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/context-preparation-v0.md).
+[Context assembly contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/contracts/context-assembly-v0.md), [Context preparation contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/contracts/context-preparation-v0.md).

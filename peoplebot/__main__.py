@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from datetime import UTC, datetime
 
 from ._json import stable_json_bytes
 from .alpha import (
@@ -17,7 +18,32 @@ from .alpha import (
     setup_alpha_environment,
 )
 from .provenance import ExecutionStart, GitAttemptStore
+from .development import (
+    CodexDevelopmentAdapter,
+    DevelopmentError,
+    ExactProjectReviewer,
+    load_development_authority,
+    load_development_cycle_operations,
+    load_development_reader_recovery,
+    reconcile_development_cycle_reader,
+    run_development_cycle_command,
+)
+from .adapters.project_review import ProjectReviewAdapter
 from .state import StateRef, StateResolutionError, resolve_state
+from .work_cycle import (
+    CycleError,
+    TaskDisposition,
+    TaskHandlerResult,
+    load_cycle_bindings,
+    load_task_policy,
+    run_work_cycle_tick,
+)
+from .usage import (
+    collect_usage,
+    load_instance_usage_profile,
+    load_usage_collection_config,
+    report_run_usage,
+)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -57,6 +83,58 @@ def _parser() -> argparse.ArgumentParser:
     resume.add_argument("--memory-checkout", required=True)
     resume.add_argument("--memory-commit", required=True)
     resume.add_argument("--memory-path", action="append", required=True)
+
+    tick = commands.add_parser(
+        "work-cycle-tick", help="run one finite message-driven work-cycle tick"
+    )
+    tick.add_argument("--bindings", required=True, help="absolute cycle-bindings JSON path")
+    tick.add_argument("--policy", required=True, help="absolute task-policy JSON path")
+    tick.add_argument("--execution-id", required=True)
+    tick.add_argument("--started-at", help="optional deterministic fixture timestamp")
+    tick.add_argument("--finished-at", help="optional deterministic fixture timestamp")
+    tick.add_argument(
+        "--offline-fixture",
+        action="store_true",
+        help="enable only the deterministic fixture.complete handler",
+    )
+    development = commands.add_parser(
+        "development-cycle-tick",
+        help="run one approved private implementation and exact-review cycle",
+    )
+    development.add_argument("--bindings", required=True)
+    development.add_argument("--policy", required=True)
+    development.add_argument("--authority", required=True)
+    development.add_argument("--operations", required=True)
+    development.add_argument("--execution-id", required=True)
+    recovery = commands.add_parser(
+        "development-cycle-reconcile",
+        help="reconcile one exact evidence-proven stopped development task",
+    )
+    recovery.add_argument("--bindings", required=True)
+    recovery.add_argument("--recovery", required=True)
+    recovery.add_argument("--execution-id", required=True)
+    usage = commands.add_parser(
+        "usage-collect",
+        help="incrementally collect sanitized local provider usage and check autonomous admission",
+    )
+    usage.add_argument("--config", required=True)
+    usage.add_argument("--phase", choices=("entry", "exit", "manual"), required=True)
+    usage.add_argument("--execution-id")
+    usage.add_argument("--task-id")
+    usage.add_argument("--observed-at", help="optional deterministic fixture timestamp")
+    report = commands.add_parser(
+        "usage-report-run",
+        help="save one run's available usage through its Instance environment profile",
+    )
+    report.add_argument("--profile", required=True)
+    report.add_argument("--run-id", required=True)
+    report.add_argument("--trigger", choices=("manual", "scheduled"), required=True)
+    report.add_argument("--phase", choices=("start", "completion", "recovery"), required=True)
+    report.add_argument("--observed-at", help="optional deterministic fixture timestamp")
+    report.add_argument("--started-at")
+    report.add_argument("--finished-at")
+    report.add_argument("--outcome", choices=("success", "failed", "stopped", "idle", "unknown"))
+    report.add_argument("--turn-id", action="append", default=[])
     return parser
 
 
@@ -134,7 +212,7 @@ def main(arguments: list[str] | None = None) -> int:
                 AlphaAdoptionRequest(args.candidate_checkout, current, candidate),
                 lambda: args.finished_at,
             ).to_dict()
-        else:
+        elif args.command == "alpha-resume":
             selection_state = StateRef(
                 args.environment_repository,
                 args.selection_commit,
@@ -149,6 +227,114 @@ def main(arguments: list[str] | None = None) -> int:
                 args.instance_id,
                 tuple(args.memory_path),
             ).to_dict()
+        elif args.command == "usage-report-run":
+            timestamp = args.observed_at or (
+                datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+            )
+            result = report_run_usage(
+                load_instance_usage_profile(args.profile),
+                args.run_id,
+                args.trigger,
+                args.phase,
+                timestamp,
+                started_at=args.started_at,
+                finished_at=args.finished_at,
+                outcome=args.outcome,
+                provider_turn_ids=tuple(args.turn_id),
+            )
+            exit_code = 0
+        elif args.command == "usage-collect":
+            timestamp = args.observed_at or (
+                datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+            )
+            result = collect_usage(
+                load_usage_collection_config(args.config),
+                timestamp,
+                phase=args.phase,
+                execution_id=args.execution_id,
+                task_id=args.task_id,
+            )
+            exit_code = 0 if args.phase != "entry" or result["admitted"] else 11
+        elif args.command == "development-cycle-reconcile":
+            bindings = load_cycle_bindings(args.bindings)
+            recovery = load_development_reader_recovery(args.recovery)
+            recovered = reconcile_development_cycle_reader(
+                bindings,
+                recovery,
+                args.execution_id,
+                datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+            )
+            result = recovered.to_dict()
+            exit_code = 0 if recovered.reconciled else 13
+        elif args.command == "development-cycle-tick":
+            authority = load_development_authority(args.authority)
+            operations = load_development_cycle_operations(args.operations)
+            if not authority.active or not operations.active:
+                result = {
+                    "active": False,
+                    "code": "development.inactive",
+                    "format": "peoplebot.development-cycle-readiness.v0",
+                    "provider_invoked": False,
+                }
+                exit_code = 13
+            else:
+                bindings = load_cycle_bindings(args.bindings)
+                policy = load_task_policy(args.policy)
+                if (
+                    bindings.environment_id != authority.environment_id
+                    or bindings.instance_id != authority.coordinator_instance_id
+                ):
+                    raise ValueError("cycle bindings do not match development coordinator authority")
+                implementer = CodexDevelopmentAdapter(
+                    authority.framework_checkout, authority.development_adapter,
+                    authority.executable, authority.codex_home, authority.worktree_root,
+                )
+                reviewer = ExactProjectReviewer(ProjectReviewAdapter(
+                    authority.framework_checkout, authority.review_adapter,
+                    authority.executable, authority.codex_home,
+                ))
+                command_result = run_development_cycle_command(
+                    authority, operations, bindings, policy, implementer, reviewer,
+                    args.execution_id,
+                    datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z"),
+                )
+                result = command_result.to_dict()
+                exit_code = 0 if command_result.code == "development.completed" else 13
+        else:
+            bindings = load_cycle_bindings(args.bindings)
+            policy = load_task_policy(args.policy)
+            timestamp = (
+                datetime.now(UTC)
+                .replace(microsecond=0)
+                .isoformat()
+                .replace("+00:00", "Z")
+            )
+
+            def fixture_handler(_message):
+                return TaskHandlerResult(
+                    TaskDisposition.COMPLETED,
+                    "Offline fixture task completed without invoking a provider.",
+                )
+
+            handlers = {"fixture.complete": fixture_handler} if args.offline_fixture else {}
+            status = run_work_cycle_tick(
+                bindings,
+                policy,
+                handlers,
+                args.execution_id,
+                args.started_at or timestamp,
+                args.finished_at or timestamp,
+            )
+            result = status.to_dict()
+            exit_code = {
+                "completed": 0,
+                "idle": 0,
+                "stopped": 0,
+                "busy": 10,
+                "exhausted": 11,
+                "failed": 12,
+                "unresolved": 13,
+            }.get(status.disposition, 14)
     except ValueError as error:
         sys.stderr.write(f"input.invalid: {error}\n")
         return 2
@@ -158,9 +344,19 @@ def main(arguments: list[str] | None = None) -> int:
     except AlphaError as error:
         sys.stderr.write(f"{error}\n")
         return 4
+    except CycleError as error:
+        sys.stderr.write(f"{error}\n")
+        return 13
+    except DevelopmentError as error:
+        sys.stderr.write(f"{error}\n")
+        return 13
 
     sys.stdout.buffer.write(stable_json_bytes(result))
-    return 0
+    return exit_code if args.command in {
+        "work-cycle-tick", "development-cycle-reconcile", "development-cycle-tick",
+        "usage-collect",
+        "usage-report-run",
+    } else 0
 
 
 if __name__ == "__main__":

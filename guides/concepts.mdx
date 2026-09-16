@@ -35,7 +35,7 @@ This lets “the file I reviewed” mean a specific saved file, even if someone 
 
 The intended message is a small request or reply that points to the necessary State and results. It helps another actor find the work without receiving an entire private conversation.
 
-**The public 0.1.0a3 package does not implement message delivery.** Message references in a record describe part of the design; they do not create a working inbox. See [the coordination design](/guides/coordination).
+**The public 0.1.0a4 package implements bounded Git message publication and reading.** Message content never grants repository access or task authority. See [coordination and finite work](/guides/coordination).
 
 ## Execution: one attempt
 
@@ -59,4 +59,4 @@ A future Execution can read the exact saved items it needs. The caller currently
 
 Start with [the beginner learning path](/tutorials/start). You will use ordinary files before working with agent configuration.
 
-For the original technical definitions, see the public [framework overview](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/README.package.md).
+For the original technical definitions, see the public [framework overview](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/README.package.md).

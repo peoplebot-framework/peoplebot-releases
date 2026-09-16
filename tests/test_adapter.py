@@ -215,6 +215,13 @@ class ReadOnlyAdapterTests(unittest.TestCase):
             json.dumps(event, separators=(",", ":")).encode("utf-8") for event in events
         ) + b"\n"
 
+    def events_with(self, *extra_events: object) -> bytes:
+        events = [json.loads(line) for line in self.events().splitlines()]
+        events[2:2] = extra_events
+        return b"\n".join(
+            json.dumps(event, separators=(",", ":")).encode("utf-8") for event in events
+        ) + b"\n"
+
     def adapter(self, runner: FixtureRunner) -> CodexReadOnlyAdapter:
         return CodexReadOnlyAdapter(
             self.repository,
@@ -361,6 +368,201 @@ class ReadOnlyAdapterTests(unittest.TestCase):
                 )
                 self.assertTrue(result.provenance.terminal_committed)
                 self.assertEqual(len([call for call in runner.calls if call[0][1] == "exec"]), 1)
+
+    def test_pinned_non_tool_items_remain_supported(self) -> None:
+        for item_type in ("reasoning", "todo_list", "error"):
+            with self.subTest(item_type=item_type):
+                stdout = self.events_with(
+                    {
+                        "type": "item.completed",
+                        "item": {"id": "status", "type": item_type},
+                    }
+                )
+                result = run_read_only_licensing_execution(
+                    self.repository,
+                    self.runtime_root,
+                    self.store,
+                    self.start(f"execution:supported-{item_type}"),
+                    self.adapter(
+                        FixtureRunner(subprocess.CompletedProcess(("codex",), 0, stdout, b""))
+                    ),
+                    lambda: "2026-09-09T12:00:01Z",
+                )
+                self.assertEqual(result.adapter_observation.code, "adapter.completed")
+                diagnostics = result.adapter_observation.event_diagnostics
+                self.assertIsNotNone(diagnostics)
+                self.assertEqual(diagnostics.restricted_items, 0)
+                self.assertEqual(diagnostics.unknown_item_types, 0)
+                self.assertGreaterEqual(diagnostics.supported_non_tool_items, 2)
+
+    def test_event_and_item_failures_are_distinct_sanitized_and_non_throwing(self) -> None:
+        sensitive_unknown = "future_item_do_not_retain_" + ("x" * 8192)
+        cases = (
+            (
+                "unknown-item",
+                {"type": "item.completed", "item": {"type": sensitive_unknown}},
+                "adapter.item_unsupported",
+                "unknown_item_type",
+            ),
+            (
+                "missing-item-type",
+                {"type": "item.completed", "item": {"id": "missing"}},
+                "adapter.item_malformed",
+                "missing_item_type",
+            ),
+            (
+                "array-item-type",
+                {"type": "item.completed", "item": {"type": ["private", "value"]}},
+                "adapter.item_malformed",
+                "malformed_item_type",
+            ),
+            (
+                "object-item-type",
+                {"type": "item.completed", "item": {"type": {"private": "value"}}},
+                "adapter.item_malformed",
+                "malformed_item_type",
+            ),
+            (
+                "unknown-event",
+                {"type": "future.event", "payload": "do not retain"},
+                "adapter.event_unsupported",
+                "unknown_event_type",
+            ),
+            (
+                "missing-event-type",
+                {"payload": "do not retain"},
+                "adapter.event_malformed",
+                "missing_event_type",
+            ),
+            (
+                "array-event-type",
+                {"type": ["private", "value"]},
+                "adapter.event_malformed",
+                "malformed_event_type",
+            ),
+            (
+                "object-event-type",
+                {"type": {"private": "value"}},
+                "adapter.event_malformed",
+                "malformed_event_type",
+            ),
+            (
+                "non-object-event",
+                ["private", "top-level"],
+                "adapter.event_malformed",
+                "non_object_event",
+            ),
+        )
+        for suffix, extra_event, expected_code, expected_classification in cases:
+            with self.subTest(case=suffix):
+                stdout = self.events_with(extra_event)
+                result = run_read_only_licensing_execution(
+                    self.repository,
+                    self.runtime_root,
+                    self.store,
+                    self.start(f"execution:event-{suffix}"),
+                    self.adapter(
+                        FixtureRunner(subprocess.CompletedProcess(("codex",), 0, stdout, b""))
+                    ),
+                    lambda: "2026-09-09T12:00:01Z",
+                )
+                observation = result.adapter_observation
+                self.assertEqual(observation.code, expected_code)
+                self.assertEqual([item.value for item in observation.usage], [100, 10, 25, 5])
+                self.assertEqual(
+                    observation.event_diagnostics.entries[0].classification.value,
+                    expected_classification,
+                )
+                if suffix == "unknown-item":
+                    fingerprint = (
+                        observation.event_diagnostics.entries[0].value_fingerprint
+                    )
+                    self.assertEqual(fingerprint.length, len(sensitive_unknown))
+                    self.assertLess(len(json.dumps(fingerprint.to_dict())), 512)
+                serialized = json.dumps(observation.to_dict(), sort_keys=True)
+                self.assertNotIn("private", serialized)
+                self.assertNotIn("future.event", serialized)
+                self.assertNotIn(sensitive_unknown, serialized)
+                persisted = self.store.read_evidence(result.observation_evidence)
+                self.assertEqual(
+                    persisted["adapter_observation"]["event_diagnostics"]["entries"][0][
+                        "classification"
+                    ],
+                    expected_classification,
+                )
+
+    def test_only_pinned_tool_and_command_items_are_restriction_violations(self) -> None:
+        for item_type in (
+            "collab_tool_call",
+            "command_execution",
+            "file_change",
+            "mcp_tool_call",
+            "web_search",
+        ):
+            with self.subTest(item_type=item_type):
+                stdout = self.events_with(
+                    {"type": "item.completed", "item": {"type": item_type}}
+                )
+                result = run_read_only_licensing_execution(
+                    self.repository,
+                    self.runtime_root,
+                    self.store,
+                    self.start(f"execution:restricted-{item_type}"),
+                    self.adapter(
+                        FixtureRunner(subprocess.CompletedProcess(("codex",), 0, stdout, b""))
+                    ),
+                    lambda: "2026-09-09T12:00:01Z",
+                )
+                self.assertEqual(
+                    result.adapter_observation.code, "adapter.restriction_violated"
+                )
+                diagnostic = result.adapter_observation.event_diagnostics.entries[0]
+                self.assertEqual(diagnostic.classification.value, "restricted_item_type")
+                self.assertEqual(diagnostic.known_item_type, item_type)
+
+    def test_diagnostic_entries_are_bounded(self) -> None:
+        stdout = self.events_with(
+            *(
+                {"type": f"future.event.{index}", "payload": "never retained"}
+                for index in range(12)
+            )
+        )
+        result = run_read_only_licensing_execution(
+            self.repository,
+            self.runtime_root,
+            self.store,
+            self.start("execution:bounded-event-diagnostics"),
+            self.adapter(
+                FixtureRunner(subprocess.CompletedProcess(("codex",), 0, stdout, b""))
+            ),
+            lambda: "2026-09-09T12:00:01Z",
+        )
+        diagnostics = result.adapter_observation.event_diagnostics
+        self.assertEqual(len(diagnostics.entries), 8)
+        self.assertTrue(diagnostics.entries_truncated)
+        self.assertEqual(diagnostics.unknown_event_types, 12)
+        self.assertNotIn("never retained", json.dumps(diagnostics.to_dict()))
+
+    def test_invalid_json_event_has_a_sanitized_classification(self) -> None:
+        lines = self.events().splitlines()
+        stdout = b"\n".join((*lines[:2], b'{"type":', *lines[2:])) + b"\n"
+        result = run_read_only_licensing_execution(
+            self.repository,
+            self.runtime_root,
+            self.store,
+            self.start("execution:invalid-json-event-diagnostic"),
+            self.adapter(
+                FixtureRunner(subprocess.CompletedProcess(("codex",), 0, stdout, b""))
+            ),
+            lambda: "2026-09-09T12:00:01Z",
+        )
+        observation = result.adapter_observation
+        self.assertEqual(observation.code, "adapter.response_invalid_json")
+        diagnostic = observation.event_diagnostics.entries[0]
+        self.assertEqual(diagnostic.classification.value, "invalid_event_json")
+        self.assertIsNone(diagnostic.known_event_type)
+        self.assertEqual(diagnostic.value_fingerprint.json_type, "string")
+        self.assertNotIn('{"type":', json.dumps(observation.to_dict()))
 
     def test_timeout_and_output_limit_are_classified_without_retry(self) -> None:
         cases: tuple[tuple[str, subprocess.CompletedProcess[bytes] | BaseException, str], ...] = (

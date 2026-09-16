@@ -1,9 +1,9 @@
 ---
 title: "Command-line reference"
-description: "The four CLI commands included in the public framework release."
+description: "The bounded CLI commands included in the public framework release."
 ---
 
-**Release:** 0.1.0a3. Use the Python interpreter from your installed virtual environment. The examples below use `python` to denote that interpreter; [installation](/guides/install) gives explicit Windows and Linux paths.
+**Release:** 0.1.0a4. Use the Python interpreter from your installed virtual environment. The examples below use `python` to denote that interpreter; [installation](/guides/install) gives explicit Windows and Linux paths.
 
 ```bash
 python -m peoplebot --help
@@ -18,8 +18,13 @@ python -m peoplebot resolve-state --help
 | `alpha-setup` | Record an explicitly supplied synthetic framework selection |
 | `alpha-adopt` | Adopt a compatible synthetic framework State |
 | `alpha-resume` | Retrieve exact synthetic Instance memory in a fresh process |
+| `work-cycle-tick` | Run one finite allowlisted work-cycle tick |
+| `development-cycle-tick` | Run one explicitly bound development/review cycle |
+| `development-recover-reader` | Reconcile one exact stopped development reader failure without rerunning it |
+| `usage-collect` | Incrementally collect sanitized usage from one configured local source |
+| `usage-report-run` | Save start/completion/recovery status for one Instance run |
 
-Context assembly, project reviews, memory saving, and memory transport are Python APIs in this version. There are no `peoplebot publish`, `peoplebot start`, or `peoplebot schedule` commands in the release.
+Context assembly, project reviews, memory saving, memory transport, and message publication remain Python APIs. There are no `peoplebot start-agent` or `peoplebot schedule` commands; installation does not activate anything.
 
 ## resolve-state
 
@@ -46,4 +51,4 @@ Use each command's `--help` and the exact alpha contract for the full input set.
 
 ## Public reference
 
-[CLI source](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/peoplebot/__main__.py), [Alpha contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/alpha-bootstrap-v0.md).
+[CLI source](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/peoplebot/__main__.py), [Instance operating model](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/operations/instance-operating-model.md).

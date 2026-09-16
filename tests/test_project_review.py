@@ -52,9 +52,16 @@ def git(repository: Path, *arguments: str) -> str:
 
 
 class FakeRunner:
-    def __init__(self, response: str | BaseException, on_exec=None) -> None:
+    def __init__(
+        self,
+        response: str | BaseException,
+        on_exec=None,
+        *,
+        stdout: bytes | None = None,
+    ) -> None:
         self.response = response
         self.on_exec = on_exec
+        self.stdout = stdout
         self.calls: list[tuple[tuple[str, ...], bytes, dict[str, str], int]] = []
 
     def __call__(self, command, input_bytes, environment, timeout_seconds):
@@ -65,6 +72,8 @@ class FakeRunner:
             self.on_exec()
         if isinstance(self.response, BaseException):
             raise self.response
+        if self.stdout is not None:
+            return subprocess.CompletedProcess(command, 0, self.stdout, b"")
         events = [
             {"type": "thread.started", "thread_id": "discarded"},
             {"type": "turn.started"},
@@ -512,6 +521,54 @@ class ProjectReviewTests(unittest.TestCase):
         self.assertEqual(failed.provenance.execution_record.status, ExecutionStatus.NO_CHANGE)
         self.assertEqual([item.value for item in failed.adapter_observation.usage], [90, 30, 10])
         self.assertEqual(failed.provenance.persistence_failure.code, "provenance.persistence_failed")
+
+    def test_shared_event_diagnostic_survives_wrapper_and_persistence_failure(self) -> None:
+        response = self.response()
+        events = [
+            {"type": "thread.started", "thread_id": "not retained"},
+            {"type": "turn.started"},
+            {
+                "type": "item.completed",
+                "item": {"type": ["sensitive", "malformed"]},
+            },
+            {
+                "type": "item.completed",
+                "item": {"id": "answer", "type": "agent_message", "text": response},
+            },
+            {
+                "type": "turn.completed",
+                "usage": {
+                    "input_tokens": 90,
+                    "output_tokens": 30,
+                    "reasoning_output_tokens": 10,
+                },
+            },
+        ]
+        stdout = b"\n".join(
+            json.dumps(event, separators=(",", ":")).encode("utf-8") for event in events
+        ) + b"\n"
+
+        class FailingTerminalStore(GitAttemptStore):
+            def persist_terminal(self, start_evidence, record, companion_artifacts=None):
+                raise ProvenanceError(
+                    "provenance.persistence_failed", "synthetic terminal failure"
+                )
+
+        self.store = FailingTerminalStore(self.project, PROJECT_REPOSITORY)
+        result = self.execute(
+            "execution:event-diagnostic-persistence-failure",
+            FakeRunner(response, stdout=stdout),
+        )
+        observation = result.adapter_observation
+        self.assertEqual(observation.code, "adapter.item_malformed")
+        self.assertEqual([item.value for item in observation.usage], [90, 30, 10])
+        self.assertEqual(
+            observation.event_diagnostics.entries[0].classification.value,
+            "malformed_item_type",
+        )
+        self.assertNotIn("sensitive", json.dumps(observation.to_dict()))
+        self.assertEqual(result.provenance.persistence_failure.code, "provenance.persistence_failed")
+        self.assertIsNone(result.provenance.terminal_evidence)
 
     def test_exact_blueprint_binds_explicit_memory_without_framework_ancestry(self) -> None:
         memory_store = GitMemoryStore(self.project, PROJECT_REPOSITORY)

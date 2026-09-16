@@ -1,0 +1,9 @@
+{
+  "format": "peoplebot.codex-development-adapter.v0",
+  "max_prompt_bytes": 65536,
+  "model": "gpt-5.6-luna",
+  "runtime": "codex-cli",
+  "runtime_version": "0.153.4",
+  "sandbox": "workspace-write",
+  "timeout_seconds": 900
+}

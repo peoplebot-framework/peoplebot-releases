@@ -6,7 +6,7 @@ Its central rule is:
 
 > Git handles what is known. AI handles what must be inferred.
 
-The founding repository State was documentation-only. The current experimental foundation adds dependency-free deterministic State resolution, Execution provenance records, detached no-checkout worktree preparation, context manifests, useful UTF-8 context assembled from pinned Git objects, Windows environment-local single-Execution admission, an ordered local Git evidence path connecting admission to terminal Execution records, bounded local Instance-memory checkpoints with exact resume and explicit synchronization/recovery, and a synthetic deterministic setup/compatible-adoption proof. It does not contain a general model runtime, production Adapter, adopted public schema, message transport, or website.
+The founding repository State was documentation-only. The current experimental foundation adds dependency-free deterministic State resolution, Execution provenance records, detached no-checkout worktree preparation, context manifests, useful UTF-8 context assembled from pinned Git objects, Windows environment-local single-Execution admission, an ordered local Git evidence path connecting admission to terminal Execution records, bounded local Instance-memory checkpoints with exact resume and explicit synchronization/recovery, a synthetic deterministic setup/compatible-adoption proof, bounded owner-publishes/peer-reads Git messaging, one finite locally policy-bound work-cycle tick, and one bounded production editing/review-cycle experiment. It does not contain a general model runtime, adopted public schema, broker, generic autonomous workflow engine, or website.
 
 ## Core primitives
 
@@ -41,12 +41,16 @@ distributions.
 
 The current implementation targets Python 3.11 or newer and uses only the standard library plus Git 2.45 or newer.
 
-The `0.1.0a3` candidate builds on the published project-neutral `0.1.0a2`
-distribution and adds the accepted bounded project-review Blueprint and Adapter.
-It uses ordinary Python wheel and source distribution formats and adds no runtime
-dependencies. Installation, exact source pinning, artifact evidence, supported
-utilities, and deliberate release limits are documented in
-[the 0.1.0a3 notes](docs/releases/release-a-0.1.0a3.md).
+The `0.1.0a4` release candidate uses ordinary Python wheel and source distribution
+formats and adds no runtime dependencies. It consolidates the accepted public
+foundation with bounded messaging, finite work-cycle and development-cycle code,
+sanitized diagnostics, and local usage reporting. Installation, exact source
+pinning, the public inclusion list, and deliberate limits are documented in
+[the 0.1.0a4 notes](docs/releases/release-a-0.1.0a4.md).
+
+The [Instance operating and setup model](docs/operations/instance-operating-model.md)
+defines the reusable owner responsibilities around chats/sessions, attempt branches,
+failure handling, usage, STOP, scheduling, messaging, memory, and credentials.
 
 Run its tests:
 
@@ -270,15 +274,17 @@ leave an explicitly reported recoverable workspace remnant without masking the
 primary failure; after the first removal failure, its handle treats the path as
 manual-recovery information and will not delete later contents. Validated usage
 from already captured output is preserved even when workspace removal fails.
-Sanitized observations are stored beside terminal evidence in Git.
-Raw provider JSONL, credentials, and transcripts are not retained. The guarantee
+Sanitized observations, including bounded event classification counts and hashed
+shape metadata, are stored beside terminal evidence in Git. Raw provider JSONL,
+unknown event values, prompts, reasoning, command/tool content, authorization data,
+credentials, payloads, and transcripts are not retained. The guarantee
 ends at the directly launched child and does not prove tool prevention,
 detached-descendant termination, or remote cancellation.
 See the [experimental read-only Adapter contract](docs/contracts/read-only-adapter-v0.md).
 
 ## Bounded project-review agent type
 
-The accepted implementation adds a genuine project-neutral Blueprint at
+The project-review implementation provides a genuine project-neutral Blueprint at
 `peoplebot/blueprints/project_review/blueprint.json` and its thin Adapter at
 `peoplebot/adapters/project_review.py`, configured by
 `peoplebot/adapters/project_review/adapter.json`. The public callable
@@ -306,10 +312,65 @@ a committed Git checkout:
 python docs/examples/project_review_fake.py --framework-checkout .
 ```
 
-Private development State is not a public adoption reference. The reviewed public
-distribution commit containing the driver, configuration, Blueprint, contract,
-and package dependencies must be published before its repository/commit/path
-States become remotely resolvable.
+Private development State is not a public adoption reference. A public consumer
+must pin the published distribution repository, commit, and paths matching the
+installed artifacts.
+
+## Git messages and one finite work-cycle tick
+
+`peoplebot.messaging` publishes bounded immutable messages to an environment-owned
+direct Git ref and reads explicitly configured peer refs. Owner destinations and
+peer sources are separate types, replies require exact correlation, exact State
+references resolve only through caller-supplied checkouts, and owner publication
+holds one local publisher admission while pushing and verifying the exact appended
+commit against the configured write endpoint. Outcomes remain verified, failed,
+or uncertain without automatic retry.
+
+`peoplebot.work_cycle` adds durable per-Instance reader progress and performs at
+most one locally allowlisted task. It records a claim before dispatch, uses the
+existing admission boundary while retaining logical tick ownership through all
+post-handler work, optionally composes with the explicit Instance-memory API,
+publishes a correlated reply, and records a compact execution-bound sanitized
+status. Fresh-process recovery does not redispatch completed or interrupted
+claims; claimed, unresolved, and accepted-stop records remain explicit durable
+barriers. Terminal persistence failures preserve the original outcome and known
+States without retrying effects or claiming failed writes succeeded. The Windows
+launcher and inactive Task Scheduler template are preparation only; no task is
+registered or enabled.
+
+See [messaging v0](docs/contracts/messaging-v0.md), [finite work cycle v0](docs/contracts/work-cycle-v0.md), and the [Windows single-tick procedure](docs/operations/windows-single-tick.md). Run the no-provider, two-environment deterministic fixture with:
+
+```text
+python docs/examples/message_work_cycle_fake.py
+```
+
+## Bounded development-cycle experiment
+
+`peoplebot.development` supplies a handler that the finite work cycle can use for
+one explicitly approved coding task. A strict local authority file
+and exact task State—not message prose—bind the repository, base commit, allowed
+paths, verification commands, candidate ref, three distinct Instances, and shared
+finite limits. The editing Adapter works in an isolated worktree; deterministic host
+code rejects symbolic refs and HEAD movement, verifies the actual base diff, bounds
+verification processes by remaining time, and commits only an unchanged verified
+tree. The existing supplied-context project reviewer receives an exact requirements,
+request, diff and host-verification packet for that candidate. Durable
+pre-launch reservations prevent restart from refreshing or repeating model calls.
+
+The supported command serially publishes and discovers only a selected structured
+task, explicitly checkpoints Instance memory, publishes its sovereign reply, and
+verifies a bounded append-only coordination reply. Permitted corrections receive
+the preceding validated findings and exact review evidence. The shipped
+package contains no active environment/session binding. Installing it does not
+register a scheduler, invoke a provider, push a candidate, or change credentials.
+See the [contract](docs/contracts/development-cycle-v0.md) and
+[activation checklist](docs/operations/development-cycle-acceptance.md). Run the
+complete production composition with fake process responses and a real synthetic
+Git candidate using:
+
+```text
+python docs/examples/development_cycle_fake.py
+```
 
 ## License and origin
 

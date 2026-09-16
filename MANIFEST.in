@@ -7,11 +7,20 @@ recursive-include tests *.py
 recursive-include config *.json
 recursive-include docs/contracts *.md
 include docs/releases/public-distribution-inspection.md
-include docs/releases/release-a-0.1.0a3.md
+include docs/releases/release-a-0.1.0a4.md
 include docs/examples/instance_memory_checkpoint.py
 include docs/examples/project_review_fake.py
-include releases/0.1.0a3/ADOPTION.md
-include releases/0.1.0a3/RELEASE_NOTES.md
+include docs/examples/message_work_cycle_fake.py
+include docs/examples/development_cycle_fake.py
+include docs/operations/instance-operating-model.md
+include docs/operations/instance-usage-profile-adoption.md
+include docs/operations/local-usage-collection.md
+include docs/operations/windows-single-tick.md
+include docs/operations/development-cycle-acceptance.md
+include operations/windows/peoplebot-single-tick.ps1
+include operations/windows/peoplebot-single-tick-task.xml.template
+include releases/0.1.0a4/ADOPTION.md
+include releases/0.1.0a4/RELEASE_NOTES.md
 exclude README.md
 global-exclude *.py[cod]
 global-exclude *.log

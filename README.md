@@ -1,66 +1,38 @@
 # PeopleBot releases
 
-This repository distributes reviewed PeopleBot release artifacts without exposing
-the private development repository's Git history or operational environment.
+This public repository distributes reviewed PeopleBot framework source and release
+artifacts without publishing the private development repository's Git history or
+operational environment.
 
-## Proposed prerelease candidate: 0.1.0a3
+## Current experimental framework: 0.1.0a4
 
-The local `0.1.0a3` candidate adds the accepted bounded project-review Blueprint
-and purpose-specific Adapter to the public distribution tree. It remains pending
-read-only review and separate publication authorization. No tag, release, or
-public asset exists for this candidate yet.
+PeopleBot `0.1.0a4` consolidates the deterministic foundation and bounded
+project-review agent from earlier prereleases with experimental Git messaging,
+finite work-cycle and development-cycle utilities, sanitized diagnostic
+corrections, and per-Instance usage reporting.
 
-The candidate source tree includes exact public paths for the Blueprint and
-Adapter, plus project-neutral adoption instructions under
-[`releases/0.1.0a3`](releases/0.1.0a3/ADOPTION.md). Installation alone does not
-create or activate an Instance.
+It is not stable 1.0, a general autonomous runtime, or a functioning Architect.
+Installation does not create an Instance, bind a provider chat, configure
+credentials, enable a schedule, or grant project authority.
 
-## Current published prerelease: 0.1.0a2
+Download the wheel, matching source archive, public provenance, and `SHA256SUMS`
+from the [0.1.0a4 prerelease](https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a4).
+Read the [release notes](releases/0.1.0a4/RELEASE_NOTES.md),
+[adoption boundary](releases/0.1.0a4/ADOPTION.md), and
+[Instance operating model](docs/operations/instance-operating-model.md) before use.
 
-PeopleBot `0.1.0a2` is an experimental prerelease of Git-native framework
-utilities. It is not a functioning Architect or a ready-made project-task agent.
-It supersedes `0.1.0a1` for new downloads because project-specific documentation
-was removed and the consuming-environment boundary was made explicitly neutral.
+Python 3.11 or newer and Git 2.45 or newer are required. Windows-specific
+single-Instance admission and the supplied Codex CLI adapters/usage formats are
+the implemented platform paths. No active runtime binding is distributed.
 
-Release page:
+## Other releases
 
-`https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a2`
-
-Download and verify:
-
-- `peoplebot-0.1.0a2-py3-none-any.whl`
-- `peoplebot-0.1.0a2.tar.gz`
-- `peoplebot-0.1.0a2-public-provenance.json`
-- `SHA256SUMS`
-
-```text
-sha256sum -c SHA256SUMS
-```
-
-Install only the verified wheel, without resolving runtime dependencies:
-
-```text
-python -m pip install --no-deps ./peoplebot-0.1.0a2-py3-none-any.whl
-peoplebot --help
-python -m peoplebot --help
-```
-
-Python 3.11 or newer is required. Git-backed operations require Git 2.45 or newer.
-The v0 single-Execution admission implementation is Windows-specific. The package
-declares no runtime dependencies.
-
-The matching source is the verified `peoplebot-0.1.0a2.tar.gz` asset and is
-available without private development access. See
-[`RELEASE_NOTES.md`](releases/0.1.0a2/RELEASE_NOTES.md),
-[`ADOPTION.md`](releases/0.1.0a2/ADOPTION.md), and
-[`CORRECTION.md`](releases/0.1.0a2/CORRECTION.md).
-
-## Historical 0.1.0a1
-
-Version `0.1.0a1` is superseded. Its public Git history and published downloads are
-historical public content; the correction does not claim to erase them.
+Framework versions `0.1.0a1`, `0.1.0a2`, and `0.1.0a3` remain immutable
+historical prereleases. The separately named `syslog-onboarding-v0.1.0` release is
+a different component, not a newer framework package. Public documentation and
+syslog material already on `main` are preserved alongside this update.
 
 ## License
 
 PeopleBot is licensed `GPL-3.0-only`. The complete `LICENSE` and creator
-acknowledgment in `LICENSING.md` accompany the distribution and artifacts.
+acknowledgment in `LICENSING.md` accompany the source and artifacts.

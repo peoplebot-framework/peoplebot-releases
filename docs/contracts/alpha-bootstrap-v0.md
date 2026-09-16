@@ -29,6 +29,19 @@ development ancestry accidentally. Repeating setup with identical exact inputs
 and timestamp in another object-format-compatible repository produces the same
 selection bytes, tree, and commit.
 
+An operational installation also prepares one owner-local usage collection
+configuration as described in `docs/operations/local-usage-collection.md`. Its
+default is a changeable 10% remaining allowance threshold with conservative
+missing/stale admission. Environment-specific source paths and session IDs are
+configuration, not deterministic framework selection content, and the local
+ledger is synchronized only at existing authorized Git boundaries.
+
+Setup also binds that collector through the environment's existing Instance
+profile, including the exact session, source kind/locator, owner-local run-record
+path, deterministic operation, and authorized batched synchronization destination.
+The adopted Instance workflow invokes it at start, completion, and the next normal
+recovery for late data; unsupported sources remain explicitly unsupported.
+
 The selection records exact framework, Blueprint, compatibility-anchor, and source
 States plus their observed Git object IDs; it also records the source byte count
 and SHA-256 digest. A branch or fixture label is not exact State. The stable ref is

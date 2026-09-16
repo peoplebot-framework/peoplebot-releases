@@ -1,7 +1,7 @@
 # Experimental Project-review Blueprint and Adapter v0
 
-Status: candidate implementation in a local public-distribution State. It is not
-remotely resolvable until that exact reviewed distribution commit is published.
+Status: experimental public implementation, not an adopted stable schema or live
+acceptance claim.
 
 This contract defines one genuine reusable agent type and one thin Codex Adapter
 for a bounded review of explicitly supplied pinned project text. It is not a
@@ -69,7 +69,7 @@ bytecode are not independently attested.
 
 ## Invocation, validation, and meaning
 
-The pinned private-review configuration uses installed `codex-cli 0.153.4`, model
+The pinned release configuration uses `codex-cli 0.153.4`, model
 `gpt-5.6-luna`, read-only sandboxing, and the documented `codex exec` flags already
 used by the licensing Adapter. Current installed `codex exec --help` was inspected
 for those flags. The licensing Adapter configuration and response protocol remain
@@ -80,6 +80,15 @@ There is no retry and no model-driven tool path. The prompt asks for supplied
 context only and no tools or external actions; supported event inspection rejects
 an observed tool/command event. As with the existing Adapter, this is detection,
 not proof that all external behavior is prevented.
+
+The shared parser uses the exact event/item vocabulary pinned in the read-only
+Adapter contract. Recognized non-tool status items remain allowed; only recognized
+tool/command items produce `adapter.restriction_violated`. Unknown and malformed
+event or item types are separately classified after type validation. The returned
+project-review observation and its terminal companion carry the same bounded,
+sanitized counts and fingerprints as the shared transport, never the raw stream,
+unknown names, prompt, reasoning, command text, tool data, authorization data, or
+payloads.
 
 PeopleBot independently parses the response with duplicate-key detection and
 validates strict UTF-8 encodability, exact fields, JSON types, allowed
@@ -111,7 +120,8 @@ Execution record, including when malformed Unicode is rejected before response
 hashing or after JSON parsing. A terminal companion persistence failure leaves
 exact admitted start evidence incomplete; it does not rerun the provider or recast
 returned success as durable evidence. Process, terminal-persistence, and
-admission-release failures remain distinct.
+admission-release failures remain distinct. Sanitized event diagnostics survive in
+the returned Adapter observation even when terminal companion persistence fails.
 
 Accepting a review does not save memory. A caller may separately and explicitly
 pass this exact Blueprint State to `MemoryCheckpointRequest`. The memory commit
@@ -135,11 +145,10 @@ one reviewed full distribution commit, and the paths above for its Blueprint and
 Adapter States. The development-source commit and the later public-distribution
 commit are intentionally different identities even when file bytes match.
 
-The candidate public-distribution commit is deliberately separate from private
-development ancestry. Adoption requires review and publication of that exact
-commit plus artifacts whose installed bytes match its selected Git objects. A
-wheel or source-archive checksum authenticates an archive but is not itself a
-publicly resolvable Git `StateRef`.
+Public adoption uses one reviewed commit in
+`peoplebot-framework/peoplebot-releases` and an artifact whose installed bytes
+match that public Git State. A wheel or source-archive checksum authenticates an
+archive but is not itself a publicly resolvable Git `StateRef`.
 
 ## Deliberate limits
 

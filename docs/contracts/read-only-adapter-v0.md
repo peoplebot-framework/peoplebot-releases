@@ -64,6 +64,18 @@ offers no stronger purpose-specific no-tools switch used by this experiment.
 Therefore event inspection detects and rejects an observed tool event after the
 fact; prompt wording and detection do not prove prevention of external effects.
 
+The event vocabulary is pinned to the installed `codex-cli 0.153.4` official
+source: `openai/codex` tag `rust-v0.153.4`, commit
+`3d2ee51ca2d5db578f328aa75e20aa22c0197c9a`, file
+`codex-rs/exec/src/exec_events.rs`. `agent_message`, `reasoning`, `todo_list`, and
+non-fatal item `error` are recognized non-tool items. Only
+`command_execution`, `file_change`, `mcp_tool_call`, `collab_tool_call`, and
+`web_search` are classified as restriction violations. Unknown, missing, or
+non-string item types and unknown, missing, non-string, non-object, or invalid-JSON
+top-level events are rejected under their own classifications. Types are checked
+before set membership, so array and object values cannot turn classification into
+an unhandled type error.
+
 The model response contains only exact structured facts: `GPL-3.0-only`, distribution
 scope, required preservation/source booleans, advertising false, and the exact
 citation. Free-form explanation fields, extra fields, duplicate keys, malformed
@@ -131,21 +143,31 @@ Adapter observations retain only validated structured facts and software-rendere
 answer, runtime/version/model, exact context/configuration/blob/driver/response
 identities, the exact driver-evidence scope, explicit non-verification of executing
 code identity, direct-process and workspace-cleanup dispositions, exit code,
-sanitized stage/reason, and available provider-reported token fields. Unsupported event types are rejected
-deliberately. Failures distinguish missing completion, unsupported event, invalid
-JSON, citation mismatch, field/size failure, restriction observation, process
-failure, and invalid usage. Reliably parsed usage is retained even when answer
+sanitized stage/reason, available provider-reported token fields, and bounded event
+diagnostics. Diagnostics retain event positions, counts, known allowlisted event or
+item names, JSON value shape/length, serialized length, and SHA-256 fingerprints;
+at most eight exceptional entries are retained, with explicit truncation. Unknown
+names and malformed values are never retained verbatim. Failures distinguish
+missing completion, unknown or malformed event/item, invalid JSON, citation
+mismatch, field/size failure, restriction observation, process failure, and invalid
+usage. Reliably parsed usage is retained even when answer
 validation or subsequent workspace removal fails. Workspace-removal failure remains
 an explicit failed Adapter observation and cannot turn a validated answer into a
-successful Execution. Raw JSONL, thread identifier, diagnostics, credentials, and
+successful Execution. Raw JSONL, thread identifier, prompts, reasoning, command
+text, tool arguments/results, authorization data, credentials, payloads, and the
 provider transcript are discarded.
+
+This correction does not amend or reinterpret any earlier terminal evidence, which
+cannot identify a previously discarded item type. After the correction is reviewed,
+released, and adopted, a fresh supervised live attempt is still required to produce
+useful evidence under these classifications.
 
 A validated answer returns a truthful `no_change` `ExecutionRecord` whose resulting
 State equals starting State. A classified Adapter failure returns a truthful failed
 record and terminal outcome. While admission remains held, the terminal commit
 stores `execution.json` plus `adapter-observation.json`. The companion binds exact
 context/configuration States, validated result or failure, digest semantics,
-process disposition, and available usage. The terminal commit has the admitted-start
+process disposition, sanitized event diagnostics, and available usage. The terminal commit has the admitted-start
 commit and same-repository Adapter commit as Git parents, so the evidence ref keeps
 both source ancestry and adopted Adapter State reachable through Git's object graph;
 a commit hash written only inside JSON is not treated as reachability.

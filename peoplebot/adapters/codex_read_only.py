@@ -241,6 +241,102 @@ class WorkspaceCleanupDisposition(StrEnum):
     RECOVERABLE_REMNANT = "recoverable_remnant"
 
 
+class EventDiagnosticClassification(StrEnum):
+    RESTRICTED_ITEM_TYPE = "restricted_item_type"
+    UNKNOWN_ITEM_TYPE = "unknown_item_type"
+    MISSING_ITEM_TYPE = "missing_item_type"
+    MALFORMED_ITEM_TYPE = "malformed_item_type"
+    MALFORMED_ITEM_SHAPE = "malformed_item_shape"
+    UNKNOWN_EVENT_TYPE = "unknown_event_type"
+    MISSING_EVENT_TYPE = "missing_event_type"
+    MALFORMED_EVENT_TYPE = "malformed_event_type"
+    NON_OBJECT_EVENT = "non_object_event"
+    INVALID_EVENT_JSON = "invalid_event_json"
+    EVENT_COUNT_EXCEEDED = "event_count_exceeded"
+
+
+@dataclass(frozen=True, slots=True)
+class EventValueFingerprint:
+    """Bounded metadata for an untrusted value; the value itself is not retained."""
+
+    json_type: str
+    length: int | None
+    serialized_bytes: int
+    sha256: str
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "json_type": self.json_type,
+            "length": self.length,
+            "serialized_bytes": self.serialized_bytes,
+            "sha256": self.sha256,
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class EventDiagnostic:
+    classification: EventDiagnosticClassification
+    event_index: int
+    known_event_type: str | None = None
+    known_item_type: str | None = None
+    value_fingerprint: EventValueFingerprint | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "classification": self.classification.value,
+            "event_index": self.event_index,
+            "known_event_type": self.known_event_type,
+            "known_item_type": self.known_item_type,
+            "value_fingerprint": (
+                self.value_fingerprint.to_dict() if self.value_fingerprint else None
+            ),
+        }
+
+
+@dataclass(frozen=True, slots=True)
+class EventStreamDiagnostics:
+    schema_source: str
+    schema_version: str
+    event_lines_observed: int
+    event_lines_processed: int
+    event_count_exceeded: int
+    supported_non_tool_items: int
+    restricted_items: int
+    unknown_item_types: int
+    missing_item_types: int
+    malformed_item_types: int
+    malformed_item_shapes: int
+    unknown_event_types: int
+    missing_event_types: int
+    malformed_event_types: int
+    non_object_events: int
+    invalid_json_events: int
+    entries: tuple[EventDiagnostic, ...]
+    entries_truncated: bool
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "entries": [item.to_dict() for item in self.entries],
+            "entries_truncated": self.entries_truncated,
+            "event_count_exceeded": self.event_count_exceeded,
+            "event_lines_observed": self.event_lines_observed,
+            "event_lines_processed": self.event_lines_processed,
+            "invalid_json_events": self.invalid_json_events,
+            "malformed_event_types": self.malformed_event_types,
+            "malformed_item_shapes": self.malformed_item_shapes,
+            "malformed_item_types": self.malformed_item_types,
+            "missing_event_types": self.missing_event_types,
+            "missing_item_types": self.missing_item_types,
+            "non_object_events": self.non_object_events,
+            "restricted_items": self.restricted_items,
+            "schema_source": self.schema_source,
+            "schema_version": self.schema_version,
+            "supported_non_tool_items": self.supported_non_tool_items,
+            "unknown_event_types": self.unknown_event_types,
+            "unknown_item_types": self.unknown_item_types,
+        }
+
+
 @dataclass(frozen=True, slots=True)
 class AdapterObservation:
     code: str
@@ -262,6 +358,7 @@ class AdapterObservation:
     answer: LicensingAnswer | None
     response_sha256: str | None
     usage: tuple[UsageObservation, ...]
+    event_diagnostics: EventStreamDiagnostics | None = None
     workspace_remnant: _OwnedWorkspace | None = None
 
     @property
@@ -286,6 +383,9 @@ class AdapterObservation:
             "driver_state": self.driver_state.to_dict(),
             "driver_evidence": self.driver_evidence,
             "executing_code_identity_verified": self.executing_code_identity_verified,
+            "event_diagnostics": (
+                self.event_diagnostics.to_dict() if self.event_diagnostics else None
+            ),
             "model": self.model,
             "process_exit_code": self.process_exit_code,
             "process_started": self.process_started,
@@ -515,6 +615,7 @@ def _run_process(
     timeout_seconds: int,
     *,
     _popen: Callable[..., subprocess.Popen[bytes]] = subprocess.Popen,
+    _cwd: str | Path | None = None,
 ) -> subprocess.CompletedProcess[bytes]:
     creation_flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
     process = _popen(
@@ -523,6 +624,7 @@ def _run_process(
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         env=dict(environment),
+        cwd=os.fspath(_cwd) if _cwd is not None else None,
         shell=False,
         creationflags=creation_flags,
     )
@@ -797,10 +899,150 @@ class _CodexJsonTransportResult:
     response_text: str | None
     usage: tuple[UsageObservation, ...]
     workspace_remnant: _OwnedWorkspace | None = None
+    event_diagnostics: EventStreamDiagnostics | None = None
 
     @property
     def succeeded(self) -> bool:
         return self.code == "adapter.transport_completed"
+
+
+# Exact serde event/item variants in the installed runtime's official source:
+# openai/codex rust-v0.153.4, commit 3d2ee51ca2d5db578f328aa75e20aa22c0197c9a,
+# codex-rs/exec/src/exec_events.rs.
+_CODEX_EVENT_SCHEMA_SOURCE = (
+    "openai/codex@3d2ee51ca2d5db578f328aa75e20aa22c0197c9a:"
+    "codex-rs/exec/src/exec_events.rs"
+)
+_CODEX_EVENT_SCHEMA_VERSION = "codex-cli 0.153.4"
+_SUPPORTED_EVENT_TYPES = frozenset(
+    {
+        "error",
+        "item.completed",
+        "item.started",
+        "item.updated",
+        "thread.started",
+        "turn.completed",
+        "turn.failed",
+        "turn.started",
+    }
+)
+_SUPPORTED_NON_TOOL_ITEM_TYPES = frozenset(
+    {"agent_message", "error", "reasoning", "todo_list"}
+)
+_RESTRICTED_ITEM_TYPES = frozenset(
+    {
+        "collab_tool_call",
+        "command_execution",
+        "file_change",
+        "mcp_tool_call",
+        "web_search",
+    }
+)
+_MAX_EVENT_COUNT = 128
+_MAX_EVENT_DIAGNOSTIC_ENTRIES = 8
+_MISSING = object()
+
+
+def _json_type(value: object) -> str:
+    if value is None:
+        return "null"
+    if isinstance(value, bool):
+        return "boolean"
+    if isinstance(value, str):
+        return "string"
+    if isinstance(value, int):
+        return "integer"
+    if isinstance(value, float):
+        return "number"
+    if isinstance(value, list):
+        return "array"
+    if isinstance(value, Mapping):
+        return "object"
+    return "unsupported"
+
+
+def _event_value_fingerprint(value: object) -> EventValueFingerprint:
+    """Describe parsed untrusted JSON without retaining any of its content."""
+
+    length = len(value) if isinstance(value, (str, list, Mapping)) else None
+    try:
+        encoded = json.dumps(
+            value,
+            ensure_ascii=True,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("ascii")
+    except (RecursionError, TypeError, ValueError):
+        encoded = f"{_json_type(value)}:{length}".encode("ascii")
+    return EventValueFingerprint(
+        json_type=_json_type(value),
+        length=length,
+        serialized_bytes=len(encoded),
+        sha256=hashlib.sha256(encoded).hexdigest(),
+    )
+
+
+class _EventDiagnosticsBuilder:
+    __slots__ = ("_counts", "_entries", "event_lines_observed", "entries_truncated")
+
+    def __init__(self, event_lines_observed: int) -> None:
+        self.event_lines_observed = event_lines_observed
+        self._entries: list[EventDiagnostic] = []
+        self.entries_truncated = False
+        self._counts = {
+            "event_count_exceeded": 0,
+            "invalid_json_events": 0,
+            "malformed_event_types": 0,
+            "malformed_item_shapes": 0,
+            "malformed_item_types": 0,
+            "missing_event_types": 0,
+            "missing_item_types": 0,
+            "non_object_events": 0,
+            "restricted_items": 0,
+            "supported_non_tool_items": 0,
+            "unknown_event_types": 0,
+            "unknown_item_types": 0,
+        }
+
+    def count_supported_item(self) -> None:
+        self._counts["supported_non_tool_items"] += 1
+
+    def add(
+        self,
+        count: str,
+        classification: EventDiagnosticClassification,
+        event_index: int,
+        *,
+        known_event_type: str | None = None,
+        known_item_type: str | None = None,
+        value: object = _MISSING,
+    ) -> None:
+        self._counts[count] += 1
+        if len(self._entries) >= _MAX_EVENT_DIAGNOSTIC_ENTRIES:
+            self.entries_truncated = True
+            return
+        self._entries.append(
+            EventDiagnostic(
+                classification=classification,
+                event_index=event_index,
+                known_event_type=known_event_type,
+                known_item_type=known_item_type,
+                value_fingerprint=(
+                    _event_value_fingerprint(value) if value is not _MISSING else None
+                ),
+            )
+        )
+
+    def build(self, event_lines_processed: int) -> EventStreamDiagnostics:
+        return EventStreamDiagnostics(
+            schema_source=_CODEX_EVENT_SCHEMA_SOURCE,
+            schema_version=_CODEX_EVENT_SCHEMA_VERSION,
+            event_lines_observed=self.event_lines_observed,
+            event_lines_processed=event_lines_processed,
+            entries=tuple(self._entries),
+            entries_truncated=self.entries_truncated,
+            **self._counts,
+        )
 
 
 def _codex_environment(codex_home: Path) -> dict[str, str]:
@@ -831,6 +1073,7 @@ def _invoke_codex_json_transport(
         started: bool,
         exit_code: int | None = None,
         usage: tuple[UsageObservation, ...] = (UNKNOWN_USAGE,),
+        event_diagnostics: EventStreamDiagnostics | None = None,
         workspace: _OwnedWorkspace | None = None,
         workspace_disposition: WorkspaceCleanupDisposition | None = None,
     ) -> _CodexJsonTransportResult:
@@ -854,6 +1097,7 @@ def _invoke_codex_json_transport(
             None,
             usage,
             workspace,
+            event_diagnostics,
         )
 
     if len(prompt) > configuration.max_prompt_bytes:
@@ -997,6 +1241,7 @@ def _invoke_codex_json_transport(
         code: str,
         detail: str,
         usage: tuple[UsageObservation, ...] = (UNKNOWN_USAGE,),
+        event_diagnostics: EventStreamDiagnostics | None = None,
     ) -> _CodexJsonTransportResult:
         return failure(
             code,
@@ -1004,6 +1249,7 @@ def _invoke_codex_json_transport(
             started=True,
             exit_code=completed.returncode,
             usage=usage,
+            event_diagnostics=event_diagnostics,
             workspace=None if removed else workspace_owner,
             workspace_disposition=(
                 WorkspaceCleanupDisposition.REMOVED
@@ -1025,78 +1271,185 @@ def _invoke_codex_json_transport(
             "Codex CLI direct process returned a nonzero exit status",
         )
     usage = (UNKNOWN_USAGE,)
-    events: list[Mapping[str, Any]] = []
+    events: list[tuple[int, Mapping[str, Any]]] = []
     stream_failure: tuple[str, str] | None = None
     lines = [line for line in completed.stdout.splitlines() if line]
-    if len(lines) > 128:
-        stream_failure = (
+    diagnostics = _EventDiagnosticsBuilder(len(lines))
+
+    def classify_failure(code: str, detail: str) -> None:
+        nonlocal stream_failure
+        if stream_failure is None:
+            stream_failure = (code, detail)
+
+    if len(lines) > _MAX_EVENT_COUNT:
+        classify_failure(
             "adapter.event_unsupported",
             "Codex event stream exceeds the supported event count",
         )
-    for line in lines[:129]:
+        diagnostics.add(
+            "event_count_exceeded",
+            EventDiagnosticClassification.EVENT_COUNT_EXCEEDED,
+            _MAX_EVENT_COUNT,
+        )
+    processed_lines = lines[:_MAX_EVENT_COUNT]
+    for event_index, line in enumerate(processed_lines):
         try:
             event = json.loads(line, object_pairs_hook=_unique_object)
-        except (UnicodeDecodeError, json.JSONDecodeError, _ResponseError):
-            stream_failure = stream_failure or (
+        except (UnicodeDecodeError, json.JSONDecodeError, _ResponseError, RecursionError):
+            classify_failure(
                 "adapter.response_invalid_json",
                 "Codex event stream contains invalid JSON",
             )
-            continue
-        if not isinstance(event, Mapping):
-            stream_failure = stream_failure or (
-                "adapter.event_unsupported",
-                "Codex event stream contains a non-object event",
+            diagnostics.add(
+                "invalid_json_events",
+                EventDiagnosticClassification.INVALID_EVENT_JSON,
+                event_index,
+                value=line.decode("utf-8", "replace"),
             )
             continue
-        events.append(event)
+        if not isinstance(event, Mapping):
+            classify_failure(
+                "adapter.event_malformed",
+                "Codex event stream contains a non-object event",
+            )
+            diagnostics.add(
+                "non_object_events",
+                EventDiagnosticClassification.NON_OBJECT_EVENT,
+                event_index,
+                value=event,
+            )
+            continue
+        events.append((event_index, event))
 
     messages: list[str] = []
     completed_turns: list[Mapping[str, Any]] = []
     restriction_violated = False
-    supported_events = {
-        "error",
-        "item.completed",
-        "item.started",
-        "item.updated",
-        "thread.started",
-        "turn.completed",
-        "turn.failed",
-        "turn.started",
-    }
-    for event in events:
-        event_type = event.get("type")
-        if event_type not in supported_events:
-            stream_failure = stream_failure or (
+    item_event_types = frozenset({"item.started", "item.updated", "item.completed"})
+    for event_index, event in events:
+        event_type = event.get("type", _MISSING)
+        if event_type is _MISSING:
+            classify_failure(
+                "adapter.event_malformed",
+                "Codex event object is missing its type",
+            )
+            diagnostics.add(
+                "missing_event_types",
+                EventDiagnosticClassification.MISSING_EVENT_TYPE,
+                event_index,
+            )
+            continue
+        if not isinstance(event_type, str):
+            classify_failure(
+                "adapter.event_malformed",
+                "Codex event type is not a string",
+            )
+            diagnostics.add(
+                "malformed_event_types",
+                EventDiagnosticClassification.MALFORMED_EVENT_TYPE,
+                event_index,
+                value=event_type,
+            )
+            continue
+        if event_type not in _SUPPORTED_EVENT_TYPES:
+            classify_failure(
                 "adapter.event_unsupported",
-                "Codex emitted an unsupported event type",
+                "Codex emitted an unknown event type",
+            )
+            diagnostics.add(
+                "unknown_event_types",
+                EventDiagnosticClassification.UNKNOWN_EVENT_TYPE,
+                event_index,
+                value=event_type,
             )
             continue
         if event_type in {"error", "turn.failed"}:
-            stream_failure = stream_failure or (
+            classify_failure(
                 "adapter.process_failed",
                 "Codex event stream reports failure",
             )
         if event_type == "turn.completed":
             completed_turns.append(event)
-        if event_type in {"item.started", "item.updated", "item.completed"}:
-            item = event.get("item")
-            if not isinstance(item, Mapping):
-                stream_failure = stream_failure or (
-                    "adapter.event_unsupported",
-                    "Codex item event has an unsupported shape",
+        if event_type not in item_event_types:
+            continue
+        item = event.get("item", _MISSING)
+        if not isinstance(item, Mapping):
+            classify_failure(
+                "adapter.item_malformed",
+                "Codex item event has a missing or non-object item",
+            )
+            diagnostics.add(
+                "malformed_item_shapes",
+                EventDiagnosticClassification.MALFORMED_ITEM_SHAPE,
+                event_index,
+                known_event_type=event_type,
+                value=None if item is _MISSING else item,
+            )
+            continue
+        item_type = item.get("type", _MISSING)
+        if item_type is _MISSING:
+            classify_failure(
+                "adapter.item_malformed",
+                "Codex item object is missing its type",
+            )
+            diagnostics.add(
+                "missing_item_types",
+                EventDiagnosticClassification.MISSING_ITEM_TYPE,
+                event_index,
+                known_event_type=event_type,
+            )
+            continue
+        if not isinstance(item_type, str):
+            classify_failure(
+                "adapter.item_malformed",
+                "Codex item type is not a string",
+            )
+            diagnostics.add(
+                "malformed_item_types",
+                EventDiagnosticClassification.MALFORMED_ITEM_TYPE,
+                event_index,
+                known_event_type=event_type,
+                value=item_type,
+            )
+            continue
+        if item_type in _RESTRICTED_ITEM_TYPES:
+            restriction_violated = True
+            diagnostics.add(
+                "restricted_items",
+                EventDiagnosticClassification.RESTRICTED_ITEM_TYPE,
+                event_index,
+                known_event_type=event_type,
+                known_item_type=item_type,
+            )
+            continue
+        if item_type not in _SUPPORTED_NON_TOOL_ITEM_TYPES:
+            classify_failure(
+                "adapter.item_unsupported",
+                "Codex emitted an unknown item type",
+            )
+            diagnostics.add(
+                "unknown_item_types",
+                EventDiagnosticClassification.UNKNOWN_ITEM_TYPE,
+                event_index,
+                known_event_type=event_type,
+                value=item_type,
+            )
+            continue
+        diagnostics.count_supported_item()
+        if event_type == "item.completed" and item_type == "agent_message":
+            if not isinstance(item.get("text"), str):
+                classify_failure(
+                    "adapter.item_malformed",
+                    "Codex agent-message item has a missing or non-string text field",
                 )
-                continue
-            item_type = item.get("type")
-            if item_type not in {"agent_message", "reasoning"}:
-                restriction_violated = True
-            if event_type == "item.completed" and item_type == "agent_message":
-                if not isinstance(item.get("text"), str):
-                    stream_failure = stream_failure or (
-                        "adapter.event_unsupported",
-                        "Codex agent-message event has an unsupported shape",
-                    )
-                else:
-                    messages.append(item["text"])
+                diagnostics.add(
+                    "malformed_item_shapes",
+                    EventDiagnosticClassification.MALFORMED_ITEM_SHAPE,
+                    event_index,
+                    known_event_type=event_type,
+                    known_item_type=item_type,
+                )
+            else:
+                messages.append(item["text"])
     if len(completed_turns) == 1:
         try:
             usage = _usage_observations(completed_turns[0].get("usage"))
@@ -1105,35 +1458,42 @@ def _invoke_codex_json_transport(
                 "adapter.usage_invalid",
                 "Codex completion contains invalid provider usage",
             )
+    event_diagnostics = diagnostics.build(len(processed_lines))
     if restriction_violated:
         return completed_failure(
             "adapter.restriction_violated",
-            "Codex emitted a tool or command event for a context-only task",
+            "Codex emitted a recognized tool or command event for a context-only task",
             usage,
+            event_diagnostics,
         )
     if stream_failure is not None:
-        return completed_failure(stream_failure[0], stream_failure[1], usage)
+        return completed_failure(
+            stream_failure[0], stream_failure[1], usage, event_diagnostics
+        )
     if len(messages) != 1 or len(completed_turns) != 1:
         return completed_failure(
             "adapter.response_missing_completion",
             "Codex output lacks exactly one final answer and completion",
             usage,
+            event_diagnostics,
         )
     if not removed:
         return completed_failure(
             "adapter.workspace_cleanup_failed",
             "direct process stopped but its invocation workspace remains recoverable",
             usage,
+            event_diagnostics,
         )
     return _CodexJsonTransportResult(
-        "adapter.transport_completed",
-        "Codex CLI returned one context-only structured response",
-        True,
-        DirectProcessDisposition.STOPPED,
-        WorkspaceCleanupDisposition.REMOVED,
-        completed.returncode,
-        messages[0],
-        usage,
+        code="adapter.transport_completed",
+        detail="Codex CLI returned one context-only structured response",
+        process_started=True,
+        direct_process_disposition=DirectProcessDisposition.STOPPED,
+        workspace_cleanup_disposition=WorkspaceCleanupDisposition.REMOVED,
+        process_exit_code=completed.returncode,
+        response_text=messages[0],
+        usage=usage,
+        event_diagnostics=event_diagnostics,
     )
 
 
@@ -1288,6 +1648,7 @@ class CodexReadOnlyAdapter:
         started: bool,
         exit_code: int | None = None,
         usage: tuple[UsageObservation, ...] = (UNKNOWN_USAGE,),
+        event_diagnostics: EventStreamDiagnostics | None = None,
         workspace: _OwnedWorkspace | None = None,
         workspace_disposition: WorkspaceCleanupDisposition | None = None,
     ) -> AdapterObservation:
@@ -1322,6 +1683,7 @@ class CodexReadOnlyAdapter:
             answer=None,
             response_sha256=None,
             usage=usage,
+            event_diagnostics=event_diagnostics,
             workspace_remnant=workspace,
         )
 
@@ -1360,6 +1722,7 @@ class CodexReadOnlyAdapter:
                 started=transport.process_started,
                 exit_code=transport.process_exit_code,
                 usage=transport.usage,
+                event_diagnostics=transport.event_diagnostics,
                 workspace=transport.workspace_remnant,
                 workspace_disposition=transport.workspace_cleanup_disposition,
             )
@@ -1379,6 +1742,7 @@ class CodexReadOnlyAdapter:
                 started=True,
                 exit_code=transport.process_exit_code,
                 usage=transport.usage,
+                event_diagnostics=transport.event_diagnostics,
                 workspace_disposition=transport.workspace_cleanup_disposition,
             )
         response_bytes = stable_json_bytes(answer.to_dict())
@@ -1402,6 +1766,7 @@ class CodexReadOnlyAdapter:
             answer=answer,
             response_sha256=hashlib.sha256(response_bytes).hexdigest(),
             usage=transport.usage,
+            event_diagnostics=transport.event_diagnostics,
         )
 
 

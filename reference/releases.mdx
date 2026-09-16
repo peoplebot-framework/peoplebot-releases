@@ -3,34 +3,21 @@ title: "Releases and source identity"
 description: "Choose the right artifacts and keep documentation tied to the code you use."
 ---
 
-These guides cover **framework release 0.1.0a3**, published as an experimental prerelease. Its distribution source commit is:
-
-```text
-14b15c8bfb0b4ce9f0d827fe018b42af04969945
-```
-
-## Three useful identifiers
+These guides cover **framework release 0.1.0a4**, published as an experimental
+prerelease. Its release page and public provenance asset identify the exact
+distribution commit.
 
 | Identifier | What it tells you |
 | --- | --- |
 | Version/tag | Which named release you intend to install |
-| Artifact SHA-256 | Whether the downloaded bytes match the published checksum |
-| Full distribution commit | Which Git source State the release identifies |
+| Artifact SHA-256 | Whether downloaded bytes match the published checksum |
+| Full distribution commit | Which public Git source State the release identifies |
 
-A checksum is not a Git commit. A branch can move. A version name alone does not establish that installed driver bytes match adopted Git source. Keep all three forms of evidence when adopting a release.
+A checksum is not a Git commit. A branch can move. Keep all three forms of
+evidence. Download the wheel, matching source archive, provenance, and
+`SHA256SUMS` from the [0.1.0a4 release](https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a4).
 
-## Download the complete set
-
-The [0.1.0a3 release page](https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a3) provides the wheel, matching source archive, public provenance, and `SHA256SUMS`. [Installation](/guides/install) describes verification before use.
-
-The GitHub release body confirms publication. Some files in the pinned distribution describe the earlier candidate-preparation stage. Those files are historical snapshots; their preparation-time wording does not override the later published release record. Provenance assets retain their reviewed preparation-time flags.
-
-## Different components can have different releases
-
-The repository also has a separately named `syslog-onboarding-v0.1.0` release. It is not a newer version of the PeopleBot Python framework. Choose a tag by component and purpose instead of assuming the most recently listed release is the framework installer.
-
-## Documentation changes
-
-The documentation site can change without a new framework package. Behavioral claims in these pages remain tied to 0.1.0a3 until a later public framework version is explicitly documented. An improved guide does not add a missing runtime feature to an already published wheel.
-
-Earlier 0.1.0a1 and 0.1.0a2 distributions remain historical releases. Use the release page and its adoption notes when inspecting an older installation.
+The separately named `syslog-onboarding-v0.1.0` release is a different component,
+not a newer framework version. Public documentation can change between package
+releases; behavioral claims in these pages are tied to 0.1.0a4. Earlier framework
+prereleases remain immutable historical distributions.

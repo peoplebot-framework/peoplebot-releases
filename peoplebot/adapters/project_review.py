@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Any
 
@@ -18,6 +18,7 @@ from .codex_read_only import (
     UNKNOWN_USAGE,
     AdapterError,
     DirectProcessDisposition,
+    EventStreamDiagnostics,
     ProcessRunner,
     WorkspaceCleanupDisposition,
     _OwnedWorkspace,
@@ -409,7 +410,12 @@ def _adopt_project_review_adapter(
     except ValueError as error:
         raise AdapterError("adapter.configuration_invalid", str(error)) from error
 
-    current_driver = Path(__file__).read_bytes()
+    try:
+        current_driver = Path(__file__).read_text(encoding="utf-8").encode("utf-8")
+    except (OSError, UnicodeError) as error:
+        raise AdapterError(
+            "adapter.driver_source_unavailable", "current project-review driver is unavailable"
+        ) from error
     pinned_driver = documents[driver_path].to_source_bytes()
     driver_digest = hashlib.sha256(pinned_driver).hexdigest()
     if hashlib.sha256(current_driver).hexdigest() != driver_digest:
@@ -419,7 +425,14 @@ def _adopt_project_review_adapter(
 
     from . import codex_read_only as process_owner_module
 
-    current_owner = Path(process_owner_module.__file__).read_bytes()
+    try:
+        current_owner = (
+            Path(process_owner_module.__file__).read_text(encoding="utf-8").encode("utf-8")
+        )
+    except (OSError, UnicodeError) as error:
+        raise AdapterError(
+            "adapter.process_owner_source_unavailable", "current shared process owner is unavailable"
+        ) from error
     pinned_owner = documents[owner_path].to_source_bytes()
     owner_digest = hashlib.sha256(pinned_owner).hexdigest()
     if hashlib.sha256(current_owner).hexdigest() != owner_digest:
@@ -589,6 +602,7 @@ class ProjectReviewObservation:
     response_sha256: str | None
     validated_response_sha256: str | None
     usage: tuple[UsageObservation, ...]
+    event_diagnostics: EventStreamDiagnostics | None = None
     workspace_remnant: _OwnedWorkspace | None = None
 
     @property
@@ -611,6 +625,9 @@ class ProjectReviewObservation:
             "driver_sha256": self.driver_sha256,
             "driver_state": self.driver_state.to_dict(),
             "executing_code_identity_verified": False,
+            "event_diagnostics": (
+                self.event_diagnostics.to_dict() if self.event_diagnostics else None
+            ),
             "model": self.model,
             "objective_sha256": self.objective_sha256,
             "process_exit_code": self.process_exit_code,
@@ -688,6 +705,7 @@ class ProjectReviewAdapter:
         response: ProjectReviewResponse | None,
         response_sha256: str | None,
         usage: tuple[UsageObservation, ...],
+        event_diagnostics: EventStreamDiagnostics | None = None,
         workspace_remnant: _OwnedWorkspace | None = None,
     ) -> ProjectReviewObservation:
         adopted = self._adopted
@@ -717,6 +735,7 @@ class ProjectReviewAdapter:
             response_sha256,
             hashlib.sha256(stable_json_bytes(response.to_dict())).hexdigest() if response else None,
             usage,
+            event_diagnostics,
             workspace_remnant,
         )
 
@@ -725,9 +744,15 @@ class ProjectReviewAdapter:
         objective: str,
         context: ContextAssembly,
         blueprint: ProjectReviewBlueprint,
+        *,
+        timeout_seconds: int | None = None,
     ) -> ProjectReviewObservation:
         _require_text(objective, "objective")
         config = self.configuration
+        if timeout_seconds is not None:
+            if isinstance(timeout_seconds, bool) or not 1 <= timeout_seconds <= config.timeout_seconds:
+                raise ValueError("review timeout must be within the adopted Adapter timeout")
+            config = replace(config, timeout_seconds=timeout_seconds)
         objective_bytes = objective.encode("utf-8")
         if len(objective_bytes) > config.max_objective_bytes:
             raise ValueError("objective exceeds the configured byte limit")
@@ -794,6 +819,7 @@ class ProjectReviewAdapter:
                     response=None,
                     response_sha256=None,
                     usage=transport.usage,
+                    event_diagnostics=transport.event_diagnostics,
                     workspace_remnant=transport.workspace_remnant,
                 )
         if not transport.succeeded:
@@ -813,6 +839,7 @@ class ProjectReviewAdapter:
                     if response_bytes is not None else None
                 ),
                 usage=transport.usage,
+                event_diagnostics=transport.event_diagnostics,
                 workspace_remnant=transport.workspace_remnant,
             )
         assert transport.response_text is not None
@@ -836,6 +863,7 @@ class ProjectReviewAdapter:
                 response=None,
                 response_sha256=response_sha256,
                 usage=transport.usage,
+                event_diagnostics=transport.event_diagnostics,
             )
         return self._observation(
             blueprint,
@@ -850,6 +878,7 @@ class ProjectReviewAdapter:
             response=response,
             response_sha256=response_sha256,
             usage=transport.usage,
+            event_diagnostics=transport.event_diagnostics,
         )
 
 
@@ -863,6 +892,9 @@ def run_project_review_execution(
     context_paths: Sequence[str],
     context_policy: ContextPolicy,
     finished_at: Callable[[], str],
+    *,
+    timeout_seconds: int | None = None,
+    context_source_state: StateRef | None = None,
 ) -> ProjectReviewExecutionResult:
     """Validate exact inputs, then run one review through shared admission/provenance."""
 
@@ -874,11 +906,14 @@ def run_project_review_execution(
     config = adapter.configuration
     if len(start.objective.encode("utf-8")) > config.max_objective_bytes:
         raise ValueError("objective exceeds the adopted Adapter bound")
+    context_source = context_source_state or start.starting_state
+    if context_source.path is not None:
+        raise ValueError("context source must be a repository-level State")
     if (
-        context_policy.identity.repository != start.starting_state.repository
-        or context_policy.identity.commit != start.starting_state.commit
+        context_policy.identity.repository != context_source.repository
+        or context_policy.identity.commit != context_source.commit
     ):
-        raise ValueError("context policy must be pinned to the project starting State")
+        raise ValueError("context policy must be pinned to the exact context source State")
     if (
         context_policy.max_entries > config.max_context_entries
         or context_policy.max_blob_bytes > config.max_context_blob_bytes
@@ -887,7 +922,7 @@ def run_project_review_execution(
         raise ValueError("context policy exceeds the adopted Adapter bounds")
     policy_context = assemble_context(
         project_checkout,
-        start.starting_state,
+        context_source,
         (context_policy.identity.path,),
         ContextPolicy(context_policy.identity, 1, 65_536, 65_536),
     )
@@ -902,7 +937,7 @@ def run_project_review_execution(
         raise ValueError("context policy State content is invalid") from error
     if loaded_policy != context_policy:
         raise ValueError("supplied context policy does not match its exact State content")
-    context = assemble_context(project_checkout, start.starting_state, context_paths, context_policy)
+    context = assemble_context(project_checkout, context_source, context_paths, context_policy)
     expected_inputs = (context_policy.identity,) + tuple(item.source for item in context.documents)
     if start.input_states != expected_inputs:
         raise ValueError("Execution start must pin the context policy and selected document States")
@@ -930,7 +965,9 @@ def run_project_review_execution(
 
     def task() -> ExecutionRecord:
         nonlocal observation
-        observation = adapter.invoke(start.objective, context, blueprint)
+        observation = adapter.invoke(
+            start.objective, context, blueprint, timeout_seconds=timeout_seconds
+        )
         if observation.succeeded:
             return record(ExecutionStatus.NO_CHANGE, None)
         return record(ExecutionStatus.FAILED, TerminalOutcome(observation.code, observation.detail))

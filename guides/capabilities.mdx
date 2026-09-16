@@ -1,11 +1,11 @@
 ---
 title: "Release capabilities"
-description: "What the public 0.1.0a3 package includes and what still needs verification."
+description: "What the public 0.1.0a4 package includes and what still needs verification."
 ---
 
 Use this page to answer “Can the version I downloaded do this?” **Implemented** means the code is included; **live verification** means trying it with the real model/runtime. Those are different milestones.
 
-This page describes **0.1.0a3**, verified against its public source and [published release record](https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a3). It does not describe unreleased development work.
+This page describes **0.1.0a4**, tied to its public source and [published release record](https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a4). It does not describe private development work.
 
 | Capability | Status in this release |
 | --- | --- |
@@ -14,8 +14,11 @@ This page describes **0.1.0a3**, verified against its public source and [publish
 | Execution admission and provenance | Implemented; admission is Windows-specific |
 | Instance-memory checkpoint, explicit synchronization, and recovery | Implemented experimental APIs; separate operations |
 | Bounded project-review Blueprint and Codex adapter | Included; the release record reports no live CLI/model acceptance check |
-| Message publication, reading, and replies | Not implemented |
-| Scheduled autonomous development | Not implemented |
+| Message publication, reading, and correlated replies | Implemented experimental Git APIs with explicit owner/peer endpoints |
+| One finite work-cycle tick | Implemented experimental API and CLI |
+| Bounded development implement/review cycle | Included with fake-provider acceptance; not a general Architect or live acceptance claim |
+| Per-Instance usage collection/reporting | Implemented for two observed Codex record formats; allowance remains separate |
+| Windows scheduled launch | Disabled template and finite launcher included; installation does not register or enable it |
 | General agent migration, automatic learning, or user interface | Not implemented |
 
 ## What installation establishes
@@ -30,4 +33,4 @@ The published adapter is configured for Codex CLI 0.153.4 and model `gpt-5.6-lun
 
 A review can return findings, no findings, or insufficient evidence. A valid response format does not establish that the review is correct or complete. Its scope is the supplied context.
 
-See the public [adoption requirements](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/releases/0.1.0a3/ADOPTION.md) and [project-review contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/project-review-v0.md).
+See the public [adoption requirements](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/releases/0.1.0a4/ADOPTION.md) and [Instance operating model](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/operations/instance-operating-model.md).

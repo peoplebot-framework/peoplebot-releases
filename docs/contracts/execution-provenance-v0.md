@@ -98,6 +98,13 @@ writing a self-referential commit hash into the tree. Initial publication simila
 requires the ref not to exist. Existing refs, checked-out branches, indexes,
 working files, and untracked files are not modified.
 
+Adapter companions may include the bounded event-classification diagnostic defined
+by the adopted Adapter: counts, positions, allowlisted event/item names, value
+shape/length metadata, and SHA-256 fingerprints only. They exclude raw provider
+streams, unknown type names, prompts, reasoning, commands, tool arguments/results,
+authorization material, and payloads. A companion persistence failure remains
+separate from the in-process observation, available usage, and process outcome.
+
 Publication uses Git's reference-transaction protocol. It prepares and locks the
 exact attempt ref with the expected absent or direct-object state, inspects that
 same ref for symbolic-ref identity while the transaction lock is held, and commits

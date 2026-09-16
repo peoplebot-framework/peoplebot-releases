@@ -1,0 +1,17 @@
+{
+  "agent_type": "peoplebot.development-implementer",
+  "authority": {
+    "allowed_paths_only": true,
+    "candidate_branch_only": true,
+    "deployment": false,
+    "external_publication": false,
+    "main_mutation": false
+  },
+  "format": "peoplebot.development-blueprint.v0",
+  "purpose": "Produce one bounded candidate commit for an explicitly approved exact task.",
+  "stopping": {
+    "self_retry": false,
+    "verification_required": true
+  },
+  "version": "0"
+}

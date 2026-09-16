@@ -263,13 +263,18 @@ class _GitResult:
 class GitAttemptStore:
     """Write and read attempt evidence without touching a worktree or branch."""
 
-    def __init__(self, checkout: str | Path, repository: str) -> None:
+    def __init__(
+        self, checkout: str | Path, repository: str, *, timeout_seconds: int = 15
+    ) -> None:
         _require_text(repository, "repository")
         checkout_path = Path(checkout)
         if not checkout_path.is_dir():
             raise ProvenanceError("repository.unavailable", "checkout directory does not exist")
         self.checkout = checkout_path
         self.repository = repository
+        if isinstance(timeout_seconds, bool) or not 1 <= timeout_seconds <= 15:
+            raise ValueError("Git evidence timeout must be between 1 and 15 seconds")
+        self.timeout_seconds = timeout_seconds
 
     def _git(
         self,
@@ -296,12 +301,15 @@ class GitAttemptStore:
                 check=False,
                 env=git_environment,
                 shell=False,
-                timeout=15,
+                timeout=self.timeout_seconds,
             )
         except FileNotFoundError as error:
             raise ProvenanceError("git.unavailable", "Git executable was not found") from error
         except subprocess.TimeoutExpired as error:
-            raise ProvenanceError("git.timeout", "Git operation exceeded 15 seconds") from error
+            raise ProvenanceError(
+                "git.timeout",
+                f"Git operation exceeded {self.timeout_seconds} seconds",
+            ) from error
         return _GitResult(completed.returncode, completed.stdout, completed.stderr)
 
     @staticmethod

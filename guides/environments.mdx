@@ -5,9 +5,9 @@ description: "Understand the identities and runtime inputs that installation doe
 
 In plain language, this page explains what must be set up around an agent: where it runs, which project it works on, and what it is allowed to do. If you are learning the basics, complete the [beginner tutorials](/tutorials/start) first.
 
-**Release:** 0.1.0a3. This is a setup reference for integrators, not an automatic provisioning command.
+**Release:** 0.1.0a4. This is a setup reference for integrators, not an automatic provisioning command.
 
-An environment is the ownership boundary around an agent's runtime, repositories, credentials, Instances, and memory. Installing PeopleBot supplies reusable code. You separately decide where it runs, which projects it can access, and what work it may do.
+An Instance is one agent. An environment is the ownership boundary around one or more Instances, their runtime, repositories, credentials, assigned provider chats/sessions, and memory. Installing PeopleBot supplies reusable code. You separately decide where each Instance runs, which project it can access, and what work it may do.
 
 ## Keep the responsibilities clear
 
@@ -47,4 +47,4 @@ Treat a version label as a discovery aid and adopt the intended source commit an
 
 ## Public reference
 
-[Environment adoption contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/sovereign-environment-adoption-v0.md), [Admission contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/14b15c8bfb0b4ce9f0d827fe018b42af04969945/docs/contracts/instance-admission-v0.md).
+[Environment adoption contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/contracts/sovereign-environment-adoption-v0.md), [Instance operating model](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/operations/instance-operating-model.md).
