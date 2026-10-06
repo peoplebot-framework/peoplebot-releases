@@ -24,7 +24,11 @@
           "tutorials/snapshots",
           "tutorials/read-your-file",
           "tutorials/choose-context",
-          "tutorials/write-a-task"
+          "tutorials/write-a-task",
+          "tutorials/working-together",
+          "tutorials/review-results",
+          "tutorials/continue-a-project",
+          "tutorials/verify-backup"
         ]
       },
       {

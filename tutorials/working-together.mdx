@@ -1,0 +1,73 @@
+---
+title: "Run a project with your assistant"
+---
+
+## The workflow we use
+
+PeopleBot has been developed through a practical collaboration: a person chooses the goal, a coordinating assistant helps turn it into a clear assignment, and an agent on a project computer does the work. The coordinator reads the saved result and decides with the person what comes next.
+
+This tutorial teaches that human-guided workflow. It is not a claim that installing the public package automatically connects your chats or runs a team.
+
+## Before you begin
+
+You need an existing AI assistant, an agent able to work in your project, and a repository both can access with the appropriate permissions. A repository is a project folder with saved history; GitHub hosts a remote copy. If the coordinator cannot access it, give it the relevant files or report explicitly. Never assume a connection exists because an assistant recognizes a repository name.
+
+Start with one project and one worker. More computers are optional.
+
+## 1. Describe a useful, small job
+
+Try this in your coordinating conversation:
+
+```text
+Help me add a clear installation section to my project's README.
+First inspect the existing README and the actual setup requirements.
+Prepare one assignment with the starting commit, files to change,
+expected result, and checks. Keep unrelated changes out of scope.
+```
+
+The expected result is a concrete assignment, not a vague instruction to improve everything.
+
+## 2. Save the assignment where the worker can read it
+
+Ask the coordinator to save the approved assignment in your agreed private coordination location. Record the repository, branch, path, and exact commit. A branch is a movable line of work; a commit identifies one saved version.
+
+If your assistant has no write access, save the assignment yourself. Posting a file does not automatically wake an agent.
+
+## 3. Give the worker the reference
+
+Replace every bracketed field before sending:
+
+```text
+Read assignment [path] in [repository] at [full commit].
+Confirm the project and starting State. Complete its authorized work
+in a separate branch or worktree. Preserve unrelated changes.
+Report the result, exact commit, checks, limitations, and next step
+in our agreed coordination location. Verify the remote report exists.
+```
+
+A worktree is a separate working folder for a branch. It lets the worker keep this attempt separate from other work.
+
+## 4. Read the result together
+
+When the worker says it is finished, ask the coordinator:
+
+```text
+Read the completion report and inspect the referenced change.
+Check it against the original assignment. Distinguish what the worker
+reports from what you verified. Tell me whether to accept it,
+request a specific correction, or investigate missing evidence.
+```
+
+Expected result: a decision tied to the actual change. A successful test count is useful, but it does not replace checking whether the requested README now works for a beginner.
+
+## 5. Preserve the decision
+
+Record what was accepted, the accepted commit, any remaining issue, and the next task. A prepared branch, a merged change, and a deployed website are different outcomes. Use the outcome you actually verified.
+
+Next: [review a completion report](/tutorials/review-results).
+
+## How this relates to PeopleBot
+
+The task uses exact **States**; the worker is an **Instance**; its reusable instructions are a **Blueprint**; the assignment and reply are **Messages**; doing the job is an **Execution**.
+
+Our human-guided GitHub reports are an operating practice. They are not automatically native PeopleBot message objects or native Instance backups. The public [messaging guide](/guides/coordination) explains the framework APIs separately.

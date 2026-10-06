@@ -1,0 +1,47 @@
+---
+title: "Continue a project in a new chat"
+---
+
+## Save a handoff before leaving
+
+A handoff is a short explanation of where the project stands, with references to the evidence. It lets a new conversation start from saved work instead of relying on someone to remember months of discussion.
+
+This is a practical coordination procedure. A written handoff is not a complete transcript export or a native PeopleBot Instance backup.
+
+## 1. Ask for the handoff
+
+```text
+Save a project handoff in our agreed private repository.
+Include the goal, settled decisions, accepted commit, unmerged work,
+completed checks, unresolved problems, and next authorized action.
+Link the important reports and artifacts at exact versions.
+List anything unavailable or not preserved. Exclude credentials.
+Verify the remote handoff and give me its URL and commit.
+```
+
+Keep the handoff compact. Link to supporting records instead of repeating them all. Attachments must actually be retained; a filename or expired link does not preserve the file.
+
+## 2. Start the next conversation
+
+```text
+Continue this project from [handoff URL] at [full commit].
+Read it and the task-relevant linked evidence.
+Compare it with the current repository and newer reports.
+Preserve settled decisions, distinguish accepted from unmerged work,
+and continue the next authorized task. Tell me about missing access
+or conflicting evidence rather than inventing the previous conversation.
+```
+
+Replace the placeholders. Give the new assistant access through its supported connection; the URL alone does not grant access.
+
+## 3. Check its readback
+
+You should get the current goal, accepted version, unresolved work, and a next action consistent with the handoff. If a newer report supersedes the handoff, the assistant should explain that with a reference.
+
+## What can travel between platforms?
+
+Saved instructions, selected project knowledge, files, and reports can be read by a compatible assistant elsewhere. Tool access, credentials, provider-specific session formats, and runtime setup must be handled separately.
+
+You are preserving accessible project knowledge. You are not transferring hidden model state or guaranteeing that another model behaves identically.
+
+Next: [verify your backup](/tutorials/verify-backup).

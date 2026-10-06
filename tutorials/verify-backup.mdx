@@ -1,0 +1,51 @@
+---
+title: "Know whether your backup is usable"
+---
+
+## A saved copy is only the beginning
+
+Ask a practical question: if this computer disappeared, could you recover the intended work somewhere else?
+
+This lesson is an operator checklist informed by project experience. The public **0.1.0a4** memory APIs do not automatically provide every step below. See [memory and recovery](/guides/memory) for that release's actual interface.
+
+## 1. Identify what you are preserving
+
+Record the agent identity, project, snapshot time, exact saved State, included files and attachments, and known omissions. A report about a conversation is different from an export of that conversation.
+
+## 2. Verify the copy outside the computer
+
+Keep private backup contents encrypted when storing them remotely. Verify the intended remote file by reading it back or comparing destination-reported bytes and a trustworthy digest with the local artifact. A successful local save or an attempted upload is not enough.
+
+## 3. Keep recovery access outside the same failure point
+
+The decryption key or usable recovery method must survive loss of the protected computer. Keep it in an appropriate private location. Do not put keys, passwords, tokens, or plaintext private sessions into public Git history.
+
+## 4. Test a separate restore
+
+Restore to a separate, inactive location. Check that the intended files and exact States are present before starting an agent. Record what was restored, what was checked, and what remains untested. Restoring files does not prove that the provider session can resume.
+
+Do not silently combine two existing agents' identities because one machine failed. Another machine can hold a recovered copy without becoming that agent.
+
+## Use honest status labels
+
+| Label | Meaning |
+| --- | --- |
+| LOCAL_ONLY | A local copy exists; off-host recovery is not established |
+| REMOTE_CIPHERTEXT_VERIFIED_KEY_PENDING | The encrypted remote copy is verified; external recovery-key access is still unresolved |
+| DISASTER_RECOVERY_COMPLETE | Current local snapshot, matching remote encrypted copy, and usable recovery access outside the failed machine are established |
+| UNKNOWN | Evidence is insufficient to classify the backup |
+
+These are reporting terms for this checklist, not a promise that the public CLI emits these values. Record restore-test evidence separately.
+
+## A prompt to use with your agent
+
+```text
+Audit this agent's existing backup without replacing it.
+Identify the latest intended snapshot, what it contains and omits,
+the off-host encrypted artifact, remote verification evidence,
+and recovery-key availability outside this machine.
+Report the backup classification and any restore test.
+Do not expose secrets or call local-only storage complete.
+```
+
+Expected result: a specific status with evidence and a concrete next action for any missing piece.

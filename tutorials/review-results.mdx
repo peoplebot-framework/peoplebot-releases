@@ -1,0 +1,47 @@
+---
+title: "Check whether the work is really finished"
+---
+
+## Start with the original request
+
+A worker saying “finished” is a useful signal to inspect its report. It is not by itself proof that the result was saved, uploaded, or deployed.
+
+Use this lesson after [assigning one project task](/tutorials/working-together).
+
+## 1. Ask for a report you can check
+
+```text
+Report the assignment ID, starting commit, result commit, files changed,
+checks actually run and their results, checks not run, remaining limitations,
+and the remote location of the report. Say whether the work is prepared,
+merged, released, or deployed. Do not include secrets or raw private chats.
+```
+
+Expected result: another assistant can locate the same files without asking you to reconstruct the conversation.
+
+## 2. Separate the evidence
+
+| Statement | What to check |
+| --- | --- |
+| Implemented | Inspect the change at the reported commit |
+| Tests passed | Read which tests ran, on which system, and their actual results |
+| Independently checked | Identify what the reviewer inspected or reran |
+| Released | Confirm the change is in the published version and artifacts |
+| Operational | Confirm the intended behavior ran in the target environment |
+| Deployed | Open the intended site and check the changed content |
+
+A Linux reviewer should not present a Windows-only test as independently rerun. A simulated provider test proves the tested mechanics, not a real model's performance.
+
+## 3. Correct one concrete gap
+
+If the report exists only locally, ask the worker to publish and verify that report. Do not repeat the underlying work just to recreate a missing message.
+
+If the behavior is wrong, describe the unmet requirement, the evidence, and the smallest useful correction. Preserve the failed attempt in its branch and record a new attempt separately.
+
+## 4. Stop when the task is sufficiently verified
+
+For an ordinary documentation change, inspect the text, links, and build. Do not turn every review into an unlimited search for hypothetical failures. Additional checks should resolve a concrete risk or an agreed requirement.
+
+Expected result: a clear acceptance or one bounded follow-up, with reasons.
+
+Next: [continue in a new chat](/tutorials/continue-a-project).
