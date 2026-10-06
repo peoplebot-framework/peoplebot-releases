@@ -10,14 +10,17 @@ primary cPanel credential is used.
 
 ## First run
 
-Open Actions → PeopleBot website → Run workflow. Select `main` and mode `import`.
-This reads the current homepage, robots.txt, sitemap.xml, llms.txt, and referenced
-static assets, then commits them to `website/`. It does not modify the web host.
-Import refuses to overwrite an existing `website/` directory.
+The first push that installs this workflow imports the current homepage,
+robots.txt, sitemap.xml, llms.txt, and referenced static assets into website/.
+It commits those exact bytes to GitHub before publishing and verifying them.
+The import phase does not modify the web host.
 
-After successful import, inspect the commit, then run mode `deploy` once.
-The import commit uses GITHUB_TOKEN, so it does not itself trigger a push workflow.
-Later changes to `website/` merged or pushed to `main` publish automatically.
+Later changes to website/ merged or pushed to main publish automatically.
+Workflow/script changes also run publishing, allowing deployment fixes to be tested.
+To run manually: Actions → PeopleBot website → Run workflow → main.
+Mode import only imports if source is absent; mode deploy publishes, importing
+first if necessary. Existing source is never overwritten by a fresh import.
+The import commit uses GITHUB_TOKEN and does not trigger a recursive workflow.
 
 The deployment uploads only `website/`, uploads index.html last, and verifies
 every uploaded file by downloading it over FTPS and comparing SHA-256 hashes.
