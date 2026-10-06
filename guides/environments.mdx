@@ -48,3 +48,9 @@ Treat a version label as a discovery aid and adopt the intended source commit an
 ## Public reference
 
 [Environment adoption contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/contracts/sovereign-environment-adoption-v0.md), [Instance operating model](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/operations/instance-operating-model.md).
+
+## Map your existing assistants first
+
+In our operating model, one environment represents a machine/runtime boundary. That machine can host several explicitly identified Instances assigned to different chats or jobs. Record each Instance's project, provider session, memory location, and permissions. Do not infer these bindings from a machine nickname.
+
+A coordinator conversation is not automatically a native PeopleBot Instance. Its saved reports can preserve useful project context without claiming native session capture. Start with one worker and add another existing Instance for independent review when useful; routine tasks do not require nested agents.

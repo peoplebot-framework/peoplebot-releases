@@ -57,3 +57,11 @@ Include the release version, OS, Python/Git versions, exact relevant commit, min
 ## Public reference
 
 [State errors](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/peoplebot/state.py), [Context errors](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/contracts/context-assembly-v0.md), [Execution provenance](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/contracts/execution-provenance-v0.md).
+
+## The worker says finished, but the coordinator sees nothing
+
+Verify the result branch and report were pushed to the intended remote. Compare the exact commit and report path. If the upload is missing, publish the existing work rather than rerunning it. If a report is stale, read the newer evidence before choosing another task.
+
+## A hook or launcher appears configured but does nothing
+
+Configuration, loading, triggering, and execution are separate facts. Obtain the entry signal, last successful phase, stdout, stderr, exit status, and actual OS/shell before changing quoting or retrying. Test the real executing shell. Keep a stable hook entry and develop behind it when the runtime supports that pattern. This is troubleshooting guidance, not a claim of automatic hooks in 0.1.0a4.

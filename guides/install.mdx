@@ -37,7 +37,7 @@ Get-FileHash .\peoplebot-0.1.0a4-public-provenance.json -Algorithm SHA256
 Get-Content .\SHA256SUMS
 ```
 
-Compare the first hash with the value above, then compare each remaining hash with its filename's entry in `SHA256SUMS`. Letter case does not matter. Continue only if all four match.
+Compare the first hash with the checksum printed in the linked GitHub release body, then compare each remaining hash with its filename's entry in `SHA256SUMS`. Letter case does not matter. Continue only if all four match.
 
 On Linux:
 
@@ -46,7 +46,7 @@ sha256sum SHA256SUMS
 sha256sum -c SHA256SUMS
 ```
 
-The first hash must match the value above, and the second command must report `OK` for all three entries.
+The first hash must match the checksum printed in the linked GitHub release body, and the second command must report `OK` for all three entries.
 
 ## Install in a virtual environment
 
