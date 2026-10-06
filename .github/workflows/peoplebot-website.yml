@@ -30,6 +30,9 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Inspect public FTP certificate
+        run: |
+          timeout 20 openssl s_client -starttls ftp -connect ftp.webcustoms.com:21 -servername ftp.webcustoms.com </dev/null 2>/dev/null | openssl x509 -noout -subject -issuer -dates -ext subjectAltName
       - name: Import current site if no GitHub source exists
         id: source
         env:
