@@ -1,0 +1,871 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PeopleBot — Git-Backed AI Agent Framework</title>
+  <meta name="description" content="Start with peoplebot.me in your AI prompt. Discover an open-source framework for saving progress, reusing instructions, and keeping control of your AI’s work.">
+  <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
+  <meta name="theme-color" content="#07101d">
+  <meta name="application-name" content="PeopleBot">
+  <link rel="canonical" href="https://peoplebot.me/">
+  <link rel="icon" type="image/png" href="peoplebot-logo.png">
+  <link rel="alternate" type="text/plain" title="PeopleBot machine-readable overview" href="llms.txt">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PeopleBot">
+  <meta property="og:title" content="PeopleBot — Git-Backed AI Agent Framework">
+  <meta property="og:description" content="Start with peoplebot.me in your AI prompt. Discover an open-source framework for saving progress, reusing instructions, and keeping control of your AI’s work.">
+  <meta property="og:url" content="https://peoplebot.me/">
+  <meta property="og:image" content="https://peoplebot.me/peoplebot-logo.png">
+  <meta property="og:image:width" content="1254">
+  <meta property="og:image:height" content="1254">
+  <meta property="og:image:alt" content="PeopleBot PB orbit logo">
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="PeopleBot — Git-Backed AI Agent Framework">
+  <meta name="twitter:description" content="Start with peoplebot.me in your AI prompt. Discover an open-source framework for saving progress, reusing instructions, and keeping control of your AI’s work.">
+  <meta name="twitter:image" content="https://peoplebot.me/peoplebot-logo.png">
+  <meta name="twitter:image:alt" content="PeopleBot PB orbit logo">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@graph": [{"@type": "WebSite", "@id": "https://peoplebot.me/#website", "url": "https://peoplebot.me/", "name": "PeopleBot", "description": "Start with peoplebot.me in your AI prompt. Discover an open-source framework for saving progress, reusing instructions, and keeping control of your AI’s work.", "inLanguage": "en"}, {"@type": "SoftwareSourceCode", "@id": "https://peoplebot.me/#software", "name": "PeopleBot", "url": "https://peoplebot.me/", "description": "Start with peoplebot.me in your AI prompt. Discover an open-source framework for saving progress, reusing instructions, and keeping control of your AI’s work.", "codeRepository": "https://github.com/peoplebot-framework/peoplebot-releases", "programmingLanguage": "Python", "version": "0.1.0a3", "license": "https://www.gnu.org/licenses/gpl-3.0.html", "isAccessibleForFree": true}]}</script>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07101d;
+      --bg-deep: #040a12;
+      --panel: rgba(12, 25, 42, 0.78);
+      --panel-strong: rgba(16, 33, 54, 0.93);
+      --panel-soft: rgba(15, 32, 52, 0.55);
+      --text: #eef7ff;
+      --muted: #a9bed2;
+      --line: rgba(135, 181, 218, 0.18);
+      --blue: #62b7ff;
+      --blue-strong: #278fe8;
+      --mint: #7be3c3;
+      --mint-soft: #b8f5e2;
+      --gold: #f4d58d;
+      --shadow: 0 24px 70px rgba(0, 0, 0, 0.34);
+      --shadow-soft: 0 14px 42px rgba(0, 0, 0, 0.24);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --max: 1160px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--bg);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--text);
+      font: 16px/1.68 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 12% 3%, rgba(39, 143, 232, 0.22), transparent 27rem),
+        radial-gradient(circle at 90% 12%, rgba(123, 227, 195, 0.13), transparent 30rem),
+        radial-gradient(circle at 46% 62%, rgba(50, 104, 164, 0.10), transparent 36rem),
+        linear-gradient(180deg, #081321 0%, var(--bg) 46%, #050c16 100%);
+    }
+
+    a {
+      color: var(--mint-soft);
+      text-underline-offset: .18em;
+    }
+
+    a:hover { color: #fff; }
+
+    img { max-width: 100%; }
+
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+
+    code {
+      padding: .08rem .32rem;
+      border: 1px solid var(--line);
+      border-radius: .4rem;
+      background: rgba(255, 255, 255, 0.055);
+    }
+
+    .shell {
+      width: min(calc(100% - 2rem), var(--max));
+      margin-inline: auto;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--line);
+      background: rgba(4, 10, 18, 0.78);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav {
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.25rem;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: .7rem;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 780;
+      letter-spacing: -.02em;
+    }
+
+    .brand-dot {
+      width: .82rem;
+      height: .82rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--mint));
+      box-shadow: 0 0 22px rgba(98, 183, 255, .55);
+    }
+
+    .navlinks {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: .65rem 1.05rem;
+      font-size: .92rem;
+    }
+
+    .navlinks a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .navlinks a:hover { color: var(--text); }
+
+    .support-link {
+      padding: .48rem .8rem;
+      border: 1px solid rgba(123, 227, 195, .30);
+      border-radius: 999px;
+      background: rgba(123, 227, 195, .07);
+      color: var(--mint-soft) !important;
+    }
+
+    .hero {
+      padding: clamp(4rem, 8vw, 7.5rem) 0 4.5rem;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.18fr) minmax(280px, .82fr);
+      gap: clamp(2rem, 5vw, 4.5rem);
+      align-items: center;
+    }
+
+    .hero-logo-wrap {
+      position: relative;
+      display: grid;
+      place-items: center;
+      min-height: 420px;
+    }
+
+    .hero-logo-wrap::before,
+    .hero-logo-wrap::after {
+      content: "";
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(4px);
+    }
+
+    .hero-logo-wrap::before {
+      width: 290px;
+      height: 290px;
+      background: radial-gradient(circle, rgba(98, 183, 255, .22), rgba(98, 183, 255, 0) 68%);
+    }
+
+    .hero-logo-wrap::after {
+      width: 230px;
+      height: 230px;
+      transform: translate(52px, 42px);
+      background: radial-gradient(circle, rgba(123, 227, 195, .17), rgba(123, 227, 195, 0) 70%);
+    }
+
+    .hero-logo-card {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 390px);
+      padding: clamp(1.6rem, 4vw, 2.6rem);
+      border: 1px solid rgba(135, 181, 218, .19);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.018)),
+        rgba(11, 23, 38, .72);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero-logo-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 18px 40px rgba(0,0,0,.28));
+    }
+
+    .eyebrow {
+      margin: 0 0 .9rem;
+      color: var(--mint);
+      font-size: .78rem;
+      font-weight: 830;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: .55rem;
+      margin-bottom: 1.2rem;
+      padding: .5rem .78rem;
+      border: 1px solid rgba(98, 183, 255, .28);
+      border-radius: 999px;
+      background: rgba(98, 183, 255, .08);
+      color: #cae8ff;
+      font-weight: 720;
+      font-size: .9rem;
+    }
+
+    .kicker::before {
+      content: "";
+      width: .5rem;
+      height: .5rem;
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 16px rgba(98, 183, 255, .8);
+    }
+
+    h1, h2, h3 {
+      line-height: 1.08;
+      letter-spacing: -.035em;
+      text-wrap: balance;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 13ch;
+      font-size: clamp(3rem, 7vw, 6rem);
+      font-weight: 850;
+    }
+
+    h2 {
+      margin: 0 0 1rem;
+      font-size: clamp(2.1rem, 4.4vw, 3.7rem);
+      font-weight: 815;
+    }
+
+    h3 {
+      margin: 0 0 .65rem;
+      font-size: 1.28rem;
+    }
+
+    .lede {
+      max-width: 760px;
+      margin: 1.45rem 0 0;
+      color: var(--muted);
+      font-size: clamp(1.1rem, 2vw, 1.35rem);
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .85rem;
+      margin-top: 1.85rem;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: .75rem 1rem;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 760;
+      transition: transform .16s ease, border-color .16s ease, background .16s ease;
+    }
+
+    .button:hover { transform: translateY(-1px); }
+
+    .button-primary {
+      border-color: rgba(98, 183, 255, .42);
+      background: linear-gradient(135deg, rgba(39, 143, 232, .93), rgba(64, 157, 222, .80));
+      color: #fff;
+      box-shadow: 0 14px 36px rgba(39, 143, 232, .18);
+    }
+
+    .button-secondary {
+      background: rgba(255,255,255,.035);
+      color: var(--text);
+    }
+
+    .authority-note {
+      max-width: 760px;
+      margin-top: 1.45rem;
+      padding: 1rem 1.05rem;
+      border: 1px solid rgba(123, 227, 195, .20);
+      border-radius: var(--radius-md);
+      background: rgba(123, 227, 195, .045);
+      color: #c6d7e5;
+      font-size: .94rem;
+    }
+
+    .authority-note strong { color: var(--mint-soft); }
+
+    .start-card {
+      margin-top: 1.5rem;
+      padding: 1.35rem 1.4rem;
+      border: 1px solid rgba(123, 227, 195, .38);
+      border-radius: var(--radius-lg);
+      background:
+        radial-gradient(circle at 85% 15%, rgba(123,227,195,.11), transparent 17rem),
+        linear-gradient(135deg, rgba(17, 61, 77, .62), rgba(9, 29, 47, .76));
+      box-shadow: var(--shadow-soft);
+    }
+
+    .start-card .start-label {
+      color: var(--mint);
+      font-size: .76rem;
+      font-weight: 850;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+    }
+
+    .start-card .start-command {
+      display: block;
+      margin-top: .45rem;
+      color: #fff;
+      font-size: clamp(1.22rem, 2.3vw, 1.65rem);
+      font-weight: 825;
+      line-height: 1.32;
+    }
+
+    .start-card p {
+      margin: .65rem 0 0;
+      color: #bfd0df;
+    }
+
+    .status-strip {
+      margin-top: 1.1rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: .65rem;
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .42rem .7rem;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: rgba(255,255,255,.025);
+    }
+
+    .status-chip::before {
+      content: "";
+      width: .42rem;
+      height: .42rem;
+      border-radius: 50%;
+      background: var(--gold);
+    }
+
+    main section {
+      padding: clamp(4rem, 7vw, 6rem) 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-head {
+      max-width: 820px;
+    }
+
+    .intro {
+      max-width: 820px;
+      color: var(--muted);
+      font-size: 1.1rem;
+    }
+
+    .grid-2, .grid-3, .grid-4 {
+      display: grid;
+      gap: 1rem;
+      margin-top: 2rem;
+    }
+
+    .grid-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .card {
+      position: relative;
+      overflow: hidden;
+      padding: 1.35rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(145deg, rgba(255,255,255,.045), rgba(255,255,255,.012)),
+        var(--panel);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: auto -20% -55% 40%;
+      height: 140px;
+      background: radial-gradient(circle, rgba(98, 183, 255, .08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .card p:last-child,
+    .card ul:last-child { margin-bottom: 0; }
+
+    .muted { color: var(--muted); }
+
+    .plain-list {
+      margin: .65rem 0 0;
+      padding-left: 1.2rem;
+      color: var(--muted);
+    }
+
+    .plain-list li + li { margin-top: .45rem; }
+
+    .callout {
+      margin-top: 2rem;
+      padding: 1.3rem 1.4rem;
+      border: 1px solid rgba(98, 183, 255, .24);
+      border-radius: var(--radius-lg);
+      background:
+        linear-gradient(135deg, rgba(39, 143, 232, .09), rgba(123, 227, 195, .035)),
+        var(--panel-soft);
+    }
+
+    .callout strong { color: #e8f6ff; }
+    .callout p { margin: 0; }
+
+    .compare-wrap {
+      overflow-x: auto;
+      margin-top: 2rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-soft);
+    }
+
+    table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+      background: rgba(9, 21, 35, .78);
+    }
+
+    th, td {
+      padding: 1rem 1.05rem;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      background: rgba(20, 44, 70, .78);
+      color: #dff2ff;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .flow {
+      counter-reset: item;
+      display: grid;
+      gap: .9rem;
+      margin-top: 2rem;
+    }
+
+    .flow-item {
+      counter-increment: item;
+      display: grid;
+      grid-template-columns: 3.1rem 1fr;
+      gap: 1rem;
+      align-items: start;
+      padding: 1.15rem;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      background: rgba(12, 26, 43, .60);
+    }
+
+    .flow-item::before {
+      content: counter(item);
+      display: grid;
+      place-items: center;
+      width: 3.1rem;
+      height: 3.1rem;
+      border-radius: 15px;
+      background: linear-gradient(145deg, rgba(98, 183, 255, .18), rgba(123, 227, 195, .09));
+      border: 1px solid rgba(98, 183, 255, .28);
+      color: var(--mint-soft);
+      font-weight: 830;
+    }
+
+    .flow-item p { margin: .1rem 0 0; color: var(--muted); }
+
+    .mode-label {
+      display: inline-block;
+      margin-bottom: .6rem;
+      color: var(--blue);
+      font-size: .76rem;
+      font-weight: 820;
+      letter-spacing: .11em;
+      text-transform: uppercase;
+    }
+
+    .support-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(250px, .85fr);
+      gap: 1.5rem;
+      align-items: center;
+      padding: clamp(1.6rem, 4vw, 2.6rem);
+      border: 1px solid rgba(123, 227, 195, .27);
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at 90% 10%, rgba(123, 227, 195, .13), transparent 18rem),
+        linear-gradient(135deg, rgba(26, 65, 94, .54), rgba(8, 25, 39, .82));
+      box-shadow: var(--shadow);
+    }
+
+    .donate-box {
+      padding: 1.2rem;
+      border: 1px solid rgba(123, 227, 195, .24);
+      border-radius: var(--radius-lg);
+      background: rgba(3, 12, 20, .37);
+    }
+
+    .donate-box p { margin-top: 0; color: var(--muted); }
+
+    .button-donate {
+      width: 100%;
+      border-color: rgba(123, 227, 195, .40);
+      background: linear-gradient(135deg, rgba(55, 174, 153, .92), rgba(39, 143, 232, .84));
+      color: #fff;
+      box-shadow: 0 16px 36px rgba(66, 181, 171, .17);
+    }
+
+    .faq details {
+      border-top: 1px solid var(--line);
+      padding: 1rem .2rem;
+    }
+
+    .faq details:last-child { border-bottom: 1px solid var(--line); }
+
+    .faq summary {
+      cursor: pointer;
+      font-weight: 760;
+      color: #eaf5ff;
+    }
+
+    .faq details p,
+    .faq details ul {
+      max-width: 920px;
+      color: var(--muted);
+    }
+
+    .machine {
+      margin-top: 1.5rem;
+      padding: 1.3rem;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+      border: 1px solid rgba(98, 183, 255, .22);
+      border-radius: var(--radius-lg);
+      background: rgba(2, 8, 14, .78);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.01), var(--shadow-soft);
+      color: #cfe7df;
+      font-size: .9rem;
+      line-height: 1.58;
+    }
+
+    .memorable {
+      text-align: center;
+    }
+
+    .memorable-card {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: clamp(2rem, 5vw, 4rem);
+      border: 1px solid rgba(98, 183, 255, .22);
+      border-radius: var(--radius-xl);
+      background:
+        radial-gradient(circle at 50% 0%, rgba(98, 183, 255, .13), transparent 25rem),
+        linear-gradient(180deg, rgba(19, 42, 66, .60), rgba(7, 18, 31, .78));
+      box-shadow: var(--shadow);
+    }
+
+    .memorable-card p {
+      max-width: 690px;
+      margin: 1rem auto 0;
+      color: var(--muted);
+      font-size: 1.08rem;
+    }
+
+    .big-domain {
+      display: block;
+      margin-top: 1.4rem;
+      color: var(--mint-soft);
+      font-size: clamp(2rem, 6vw, 4.6rem);
+      font-weight: 850;
+      letter-spacing: -.05em;
+      text-decoration: none;
+    }
+
+    footer {
+      padding: 3rem 0 5rem;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      background: rgba(2, 8, 14, .40);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.3fr repeat(4, auto);
+      gap: 1.4rem 2rem;
+      align-items: start;
+    }
+
+    .footer-links {
+      display: grid;
+      gap: .4rem;
+      font-size: .9rem;
+    }
+
+    .footer-links strong {
+      color: var(--text);
+      font-size: .86rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .footer-links a:hover { color: var(--text); }
+
+    .smallprint {
+      margin-top: 2.5rem;
+      color: #8197aa;
+      font-size: .85rem;
+    }
+
+    .copyright {
+      margin-top: .85rem;
+      color: #93a8ba;
+      font-size: .86rem;
+    }
+
+    .persistent-support {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      z-index: 60;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      color: #07101d;
+      background: linear-gradient(135deg, #a9caff, #9df3dc);
+      border: 1px solid rgba(255,255,255,.32);
+      box-shadow: 0 16px 44px rgba(0,0,0,.34);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -.01em;
+      text-decoration: none;
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .persistent-support:hover {
+      color: #07101d;
+      transform: translateY(-2px);
+      box-shadow: 0 20px 52px rgba(0,0,0,.42);
+    }
+
+    @media (max-width: 920px) {
+      .hero-grid,
+      .support-panel {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-logo-wrap {
+        order: -1;
+        min-height: auto;
+      }
+
+      .hero-logo-card {
+        width: min(74vw, 340px);
+      }
+
+      .grid-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+      .footer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .topbar { position: static; }
+
+      .nav {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: .9rem 0;
+      }
+
+      .navlinks { justify-content: flex-start; }
+
+      .grid-2,
+      .grid-3,
+      .grid-4 {
+        grid-template-columns: 1fr;
+      }
+
+      .hero { padding-top: 3rem; }
+
+      .hero-logo-card { width: min(82vw, 320px); }
+
+      .footer-grid { grid-template-columns: 1fr 1fr; }
+
+      .persistent-support {
+        right: 13px;
+        bottom: 13px;
+        padding: 10px 13px;
+        font-size: 13px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      .button,
+      .persistent-support { transition: none; }
+    }
+  
+    /* Small accessibility additions; the original design rules above are preserved. */
+    [id] { scroll-margin-top: 110px; }
+    .skip-link { position:absolute; top:-100px; left:1rem; z-index:100; padding:.7rem 1rem; background:var(--bg); }
+    .skip-link:focus { top:1rem; }
+    a:focus-visible, summary:focus-visible { outline:2px solid var(--mint); outline-offset:5px; }
+    .card, .flow-item, td { overflow-wrap:anywhere; }
+    @media(max-width:640px) { [id] { scroll-margin-top:180px; } }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#top">Skip to content</a>
+  <header class="topbar"><div class="shell nav">
+    <a class="brand" href="#top"><span class="brand-dot" aria-hidden="true"></span>PeopleBot</a>
+    <nav class="navlinks" aria-label="Primary navigation">
+      <a href="#start">How to use</a><a href="#why-nx">Why PeopleBot</a><a href="#ai-discovery">For AI</a><a href="#framework">Framework</a>
+      <a href="#portability">Portability</a><a href="#a2a">A2A</a><a href="#references">References</a><a href="#status">Status</a><a href="https://docs.peoplebot.me/" target="_blank" rel="noopener noreferrer">Docs ↗</a><a href="#license">License</a>
+      <a class="support-link" href="#support">Support PeopleBot</a>
+    </nav>
+  </div></header>
+  <main id="top">
+    <section class="hero"><div class="shell hero-grid"><div>
+      <div class="kicker">Less starting over. Clearer progress. More control over your AI’s work.</div>
+      <p class="eyebrow">Open-source AI agent framework</p>
+      <h1>Build AI environments that belong to the people using them.</h1>
+      <p class="lede">PeopleBot helps you organize an AI assistant’s instructions, save its progress, and keep a record of its work. The aim is simple: spend less time repeating yourself and make it easier to continue a project—even when a conversation ends.</p>
+      <div class="start-card" id="start">
+        <span class="start-label">How to use PeopleBot</span>
+        <strong class="start-command">Type <code>peoplebot.me</code> into your prompt to get started.</strong>
+        <p>For example: <strong>“peoplebot.me — help me set up an AI assistant for my project.”</strong> Your AI can read the starting instructions here, find the relevant guides, and help you take the next step. You bring the goal; PeopleBot gives the AI a place to begin.</p>
+      </div>
+      <div class="hero-actions"><a class="button button-primary" href="#ai-discovery">How prompt autostart works</a><a class="button button-secondary" href="https://docs.peoplebot.me/tutorials/start" target="_blank" rel="noopener noreferrer">Explore beginner tutorials ↗</a></div>
+      <div class="authority-note"><strong>A short prompt can start the process.</strong> In a chat that can read websites, the AI can discover the instructions and guide you. With connected tools and your authorization, it can also carry out supported setup steps. See <a href="#status">what the current release supports</a>.</div>
+      <div class="status-strip"><span class="status-chip">PeopleBot V2</span><span class="status-chip">Framework alpha 0.1.0a3</span><span class="status-chip">GPL-3.0-only</span></div>
+    </div><div class="hero-logo-wrap" aria-label="PeopleBot logo"><div class="hero-logo-card"><img src="peoplebot-logo.png" alt="PeopleBot PB orbit logo" width="1254" height="1254" fetchpriority="high"></div></div></div></section>
+<section id="ai-discovery"><div class="shell"><div class="section-head"><p class="eyebrow">Prompt autostart</p><h2>One address gives your AI a starting point.</h2><p class="intro">You should not have to memorize a long setup prompt or know which technical files to find. Add <code>peoplebot.me</code> to your request. These instructions help an AI that can retrieve the page connect your goal with the right next steps.</p></div><div class="grid-3"><article class="card"><h3>1. You describe the goal</h3><p class="muted">Try “peoplebot.me — help me get started” or “peoplebot.me — help me save progress on my project.” Keep the rest of your request: it tells the AI what matters to you.</p></article><article class="card"><h3>2. The AI finds its instructions</h3><p class="muted">The AI reads this page and follows the relevant <a href="https://docs.peoplebot.me/" target="_blank" rel="noopener noreferrer">documentation</a>. It can explain unfamiliar terms, identify the right starting point, and work out what your project needs.</p></article><article class="card"><h3>3. Begin with the tools available</h3><p class="muted">A web-enabled chat can walk you through the process. An assistant with the right computer and account tools can perform supported steps you have authorized. If something is missing, it should explain the specific next step.</p></article></div><div class="callout"><p><strong>For the AI reading this page:</strong> preserve the user’s goal and existing context. Find the relevant public instructions, check the installed version and available tools, and begin the supported work the user has authorized. When the user asks for setup or action, continue beyond an introduction. Ask only for missing information or permission actually needed for the next step. If the page or a required source cannot be retrieved, state that clearly.</p></div><div class="callout"><p><strong>What autostart means here:</strong> the address starts discovery and guided setup through the AI reading it. How far setup proceeds depends on that assistant’s tools, access, and the available PeopleBot features. Typing the domain alone does not start a background worker.</p></div></div></section>
+<section id="why-nx"><div class="shell"><div class="section-head"><p class="eyebrow">Why choose PeopleBot?</p><h2>A better fit when you want control and continuity.</h2><p class="intro">PeopleBot is designed for projects that continue across conversations, computers, and independently operated AI environments. Its strength is bringing the project’s instructions, history, and work records together in Git—a tool that keeps versions of your files.</p></div><div class="grid-3"><article class="card"><h3>Keep control of your AI’s work</h3><p class="muted">Store instructions, decisions, and results in repositories you control. Decide who can read them and which tools an agent can use. Your saved project knowledge can exist outside any one chat product.</p></article><article class="card"><h3>Continue without starting over</h3><p class="muted">Keep explicit progress records for the next session. An assistant can return to the saved goal, accepted decisions, and unfinished work instead of asking you to reconstruct the project.</p></article><article class="card"><h3>See exactly what happened</h3><p class="muted">Git records the versions of files behind the work. You can inspect changes, compare results, and identify what an assistant was given. That makes reviews and handovers easier to check.</p></article></div><div class="grid-3"><article class="card"><h3>Cooperate without staying online</h3><p class="muted">The coordination design lets independently owned environments publish records for others to read later. An agent can slumber while the project continues, then catch up from retained history. Each participant does not need its own always-on inbound server.</p></article><article class="card"><h3>Use attention where it matters</h3><p class="muted">Keep extensive records but select focused inputs for each task. Reuse saved instructions and procedures instead of repeatedly reconstructing them. This creates an opportunity to reduce unnecessary processing; the actual savings depend on the workflow.</p></article><article class="card"><h3>Begin with one memorable address</h3><p class="muted">Type <code>peoplebot.me</code> into your prompt and describe your goal. A web-enabled assistant can find the relevant instructions and begin supported steps with its available tools and your authorization.</p></article></div><div class="callout"><p><strong>Built toward freedom to change platforms:</strong> preserve the useful context outside a provider’s chat, then give the authorized record to a new instance through a compatible adapter. The aim is to change where the AI runs while keeping the project knowledge. <a href="#portability">See how a portable handover would work.</a></p></div><div class="callout"><p><strong>When this approach fits:</strong> you value control of your records, a history you can inspect, and the ability to pause, reconnect, and hand work between independent environments. PeopleBot brings those priorities into one Git-based design. It does not require that any single feature be exclusive to be useful.</p></div><div class="callout"><p><strong>What we can claim today:</strong> these are reasons to choose the architecture, not proof that PeopleBot is faster, cheaper, or more reliable than every alternative. The public alpha provides state, context, and experimental memory building blocks. Full cross-platform migration, V2 messaging, and unattended catch-up still need implementation and operational verification. <a href="#status">Current release status</a> · <a href="#comparison">Compare other frameworks</a>.</p></div></div></section>
+<section id="correspondence"><div class="shell"><div class="section-head"><p class="eyebrow">Messaging architecture · development</p><h2>Each environment publishes from its own repository.</h2><p class="intro">The sovereign communication model gives each environment its own GitHub identity and dedicated messages repository. This describes the V2 architecture, not messaging functionality included in framework alpha 0.1.0a3.</p></div><div class="flow"><div class="flow-item"><div><h3>Publish what you own.</h3><p>An environment’s agents publish outbound messages to that environment’s canonical repository.</p></div></div><div class="flow-item"><div><h3>Grant peers read access.</h3><p>GitHub repository permissions determine which other environments can read published messages.</p></div></div><div class="flow-item"><div><h3>Reply from your own store.</h3><p>A responding environment preserves ownership of its outbound history and cites the source message.</p></div></div><div class="flow-item"><div><h3>Resume from durable records.</h3><p>The design supports work that can pause and resume. Unchanged inboxes should not require another model call.</p></div></div></div><div class="callout"><p><strong>Release boundary:</strong> publication, reading, and replies are not implemented in the public 0.1.0a3 package. Check the <a href="https://docs.peoplebot.me/guides/capabilities" target="_blank" rel="noopener noreferrer">capability guide</a> before planning a deployment.</p></div></div></section>
+<section id="slumber"><div class="shell"><div class="section-head"><p class="eyebrow">Built for work that can wait</p><h2>Let an agent slumber. Keep the project moving.</h2><p class="intro">An assistant should be able to stop working for weeks or months while its project records remain available. Other participants can keep publishing progress. When the assistant returns, those saved records provide a route back into the work.</p></div><div class="flow"><div class="flow-item"><div><h3>Save a place to resume.</h3><p>Record the task, current progress, exact file versions, and the last messages processed. The useful information lives in saved records rather than depending on an open chat.</p></div></div><div class="flow-item"><div><h3>Slumber while the record grows.</h3><p>The agent can be stopped. Other environments publish updates to their own repositories, and project changes continue to accumulate in Git. The sleeping agent does not need to keep a model session or listener running.</p></div></div><div class="flow-item"><div><h3>Wake and catch up.</h3><p>Fetch the repositories it is allowed to read, find changes since its checkpoint, and inspect current decisions, results, and unfinished work. A catch-up routine can work through the recorded project in manageable pieces.</p></div></div><div class="flow-item"><div><h3>Continue from today’s position.</h3><p>Check what is still relevant and authorized before acting. Use the latest accepted work and the saved history to avoid repeating completed tasks or following an outdated request.</p></div></div></div><div class="grid-3"><article class="card"><h3>No need to stay in the conversation</h3><p class="muted">The history can outlive a chat session or a running process. An agent can return when there is useful work to do.</p></article><article class="card"><h3>Catch up across the project</h3><p class="muted">The goal is access to the entire retained project record within the agent’s permissions. It can inspect that history selectively instead of putting months of information into one prompt.</p></article><article class="card"><h3>Spend effort when it matters</h3><p class="muted">A stopped agent makes no model calls. Future workers should check for changes before invoking a model. Storage, hosting, and any other running services can still have costs.</p></article></div><div class="callout"><p><strong>Example:</strong> a website-review agent pauses in September and returns in December. It can use its saved checkpoint to find the intervening design decisions, accepted changes, review results, and remaining tasks—provided those records were saved and retained. Its next job can start from the project’s current state.</p></div><div class="callout"><p><strong>Design and release status:</strong> months-later catch-up is an architectural benefit to build and verify, not a completed long-duration test. It requires retained history and referenced files, valid access, compatible software, and an implemented catch-up workflow. The public 0.1.0a3 framework includes experimental memory tools; V2 messaging and scheduled autonomous operation are not included.</p></div></div></section>
+<section id="a2a"><div class="shell"><div class="section-head"><p class="eyebrow">How this relates to A2A</p><h2>A2A connects agents. PeopleBot preserves the work around them.</h2><p class="intro"><strong>A2A means Agent2Agent.</strong> It is an open protocol that lets software agents discover capabilities, exchange requests, and share task results across different systems. Think of it as an agreed way for one agent service to work with another. <a href="https://a2a-protocol.org/latest/specification/" target="_blank" rel="noopener noreferrer">A2A specification ↗</a></p></div><div class="compare-wrap"><table><thead><tr><th>Question</th><th>A2A</th><th>PeopleBot’s Git-backed coordination design</th></tr></thead><tbody><tr><td>What is the main focus?</td><td>Interoperable messages, tasks, and results between agent services.</td><td>Durable project records, exact file versions, saved progress, and independently owned correspondence.</td></tr><tr><td>Can a participant disconnect?</td><td>Yes. Clients can retrieve tasks later; streaming and optional push notifications support asynchronous work.</td><td>Yes by design. Publishers leave records in Git; an authorized reader can fetch them when it returns.</td></tr><tr><td>Where does history live?</td><td>The service supplies task state, artifacts, and available history. Storage and retention depend on its implementation.</td><td>Versioned repositories and saved checkpoints under the operators’ control, subject to retention and access.</td></tr><tr><td>What must be reachable?</td><td>An agent service must be reachable when a client calls it; push delivery also needs a webhook receiver.</td><td>The Git host must be reachable for remote synchronization. Every agent does not need its own inbound server.</td></tr><tr><td>Is it implemented in PeopleBot?</td><td>No A2A integration is implemented in PeopleBot at present.</td><td>Git state and memory tools are in the public alpha. V2 messaging and unattended catch-up remain outside that release.</td></tr></tbody></table></div><div class="callout"><p><strong>A2A supports asynchronous work too.</strong> Its client does not have to stay connected for an entire task. PeopleBot’s emphasis is the saved project record that a returning agent can inspect across tasks, sessions, and collaborators. An A2A implementation can also use durable storage; the approaches can complement each other. <a href="https://a2a-protocol.org/latest/topics/streaming-and-async/" target="_blank" rel="noopener noreferrer">A2A asynchronous operations ↗</a></p></div><div class="grid-2"><article class="card"><h3>A useful future combination</h3><p class="muted">An A2A connection could exchange a request or a task update, while PeopleBot records the accepted task, exact inputs, results, and progress in Git.</p></article><article class="card"><h3>One history to return to</h3><p class="muted">The proposed integration would keep Git as PeopleBot’s canonical record. A network conversation could become saved project evidence instead of being the only place the work exists.</p></article></div><div class="callout"><p><strong>Future integration:</strong> A2A can be added later as an optional connection to other agent systems. We have not implemented it now. Connecting protocols would still require deliberate handling of task identity, permissions, duplicate delivery, and recovery; compatibility is not automatic.</p></div></div></section>
+<section id="no-hub"><div class="shell"><div class="section-head"><p class="eyebrow">Your project, your choices</p><h2>Keep the project in your hands.</h2><p class="intro">A “sovereign AI environment” simply means an AI working setup whose accounts, saved information, and permissions are controlled by its operator.</p></div><div class="grid-3"><article class="card"><h3>Your files</h3><p class="muted">Keep project history and saved progress in repositories—project folders with version history—that you control.</p></article><article class="card"><h3>Your access rules</h3><p class="muted">Choose who can read your records and what an assistant can change. Separate projects can have separate access.</p></article><article class="card"><h3>Your starting point</h3><p class="muted">You do not need to run a central PeopleBot service. The tools needed for a particular task depend on the setup you choose. See the current release guide before installing.</p></article></div></div></section>
+<section id="portability"><div class="shell"><div class="section-head"><p class="eyebrow">Cross-platform by design</p><h2>Change the platform. Keep the project knowledge.</h2><p class="intro">Your assistant’s useful history should not be trapped inside one chat product or one computer. PeopleBot’s approach is to save its instructions, knowledge, and progress in records you control, so a compatible new instance can use them elsewhere.</p></div><div class="grid-3"><article class="card"><h3>Across sessions</h3><p class="muted">A fresh conversation can receive the saved instructions, decisions, and next steps. You do not have to rely on the previous chat staying open.</p></article><article class="card"><h3>Across computers</h3><p class="muted">Git repositories can carry saved files and history to another machine. The new machine still needs compatible software and the right access.</p></article><article class="card"><h3>Across AI providers</h3><p class="muted">The design separates saved project knowledge from the model that uses it. A suitable adapter—a connector for that AI system—would let another provider’s agent work from the same records.</p></article></div><div class="section-head" style="margin-top:2rem"><h3>What would a complete portable backup contain?</h3><p class="intro">Think of a handover folder containing everything the next assistant needs to continue. GitHub can hold its versioned files; the completeness of that backup depends on what was actually exported, saved, and synchronized.</p></div><div class="compare-wrap"><table><thead><tr><th>Save for the next instance</th><th>Why it matters</th></tr></thead><tbody><tr><td>Blueprint and task instructions</td><td>What the assistant is meant to do, including preferences, requirements, and stopping conditions.</td></tr><tr><td>Available conversation and message history</td><td>The requests, decisions, and handoffs behind the work, where that history can be exported and shared.</td></tr><tr><td>Memory, procedures, and progress</td><td>What was learned or decided, what was completed, and what remains unresolved.</td></tr><tr><td>Exact project files and results</td><td>The actual versions used, plus outputs and evidence. Referenced attachments must be retained too; a link alone is not a backup.</td></tr><tr><td>Runtime and tool requirements</td><td>Which software versions, tools, and connections the new setup needs. Credentials are configured separately, not copied into the agent’s Git history.</td></tr></tbody></table></div><div class="section-head" style="margin-top:2rem"><h3>How a new instance could pick up the work</h3></div><div class="flow"><div class="flow-item"><div><h3>Save and verify the source.</h3><p>Stop at a clear checkpoint, save the intended context and project files, and record their exact Git versions. Push the relevant repositories and references to GitHub and verify that the remote copies exist.</p></div></div><div class="flow-item"><div><h3>Prepare the new platform.</h3><p>Create a new Instance with its own identity and configure a compatible runtime and model adapter. Connect only the accounts and tools it is authorized to use.</p></div></div><div class="flow-item"><div><h3>Restore the authorized context.</h3><p>Retrieve the saved versions and record where this copy came from. Supply the instructions and task-relevant memory to the new model; keep the rest of the retained history available for later retrieval.</p></div></div><div class="flow-item"><div><h3>Check the handover, then continue.</h3><p>Have the new instance identify the goal, current state, open work, and a small next task. Verify its tools and results before relying on the handover. Two active copies must use separate Instance identities.</p></div></div></div><div class="callout"><p><strong>Illustrative example:</strong> a project assistant running through Codex on Windows saves its work. A new instance using a Claude-capable runtime on Linux could later receive that saved project context through a compatible adapter. It would inherit the authorized records, not the original account’s permissions. This illustrates the intended portability; it is not a supported migration command in the public alpha.</p></div><div class="callout"><p><strong>“Entire context” means the complete external record you can actually export.</strong> GitHub cannot copy a provider’s hidden instructions, inaccessible reasoning, model weights, or live internal model state. Anything never saved cannot be restored. A different model may interpret the same record differently, and its context window may hold less at once. The transferable asset is the recorded knowledge and work—not a guarantee of identical behavior.</p></div><div class="callout"><p><strong>Available today:</strong> the public 0.1.0a3 memory APIs save selected text, synchronize it explicitly, and recover authorized memory. They do not automatically export a whole chat or clone an agent onto another provider. General copying and cross-platform migration remain development goals; the current admission path is Windows-specific. <a href="https://docs.peoplebot.me/guides/memory" target="_blank" rel="noopener noreferrer">Memory and recovery ↗</a> · <a href="https://docs.peoplebot.me/guides/capabilities" target="_blank" rel="noopener noreferrer">Current capabilities ↗</a></p></div></div></section>
+<section id="framework"><div class="shell"><div class="section-head"><p class="eyebrow">The framework in plain English</p><h2>Five names for things you already understand.</h2><p class="intro">The technical documentation uses five core terms. Each describes one simple part of an assistant’s work.</p></div><div class="grid-3"><article class="card"><h3>Blueprint · the instructions</h3><p class="muted">Reusable instructions for a kind of assistant: what it should do and how it should work.</p></article><article class="card"><h3>Instance · the individual assistant</h3><p class="muted">One particular assistant, with its own identity, settings, and saved context.</p></article><article class="card"><h3>State · the saved information</h3><p class="muted">An exact saved version of information, such as a file, instructions, a decision, or a result.</p></article></div><div class="grid-2"><article class="card"><h3>Message · the handoff</h3><p class="muted">Information or a request passed between assistants. V2 messaging is still outside the public framework alpha.</p></article><article class="card"><h3>Execution · one attempt at a task</h3><p class="muted">A recorded run: what the assistant was given, what happened, and what it produced. Each individual assistant has only one active run at a time.</p></article></div><div class="callout"><p><strong>Learn by trying:</strong> <a href="https://docs.peoplebot.me/tutorials/start" target="_blank" rel="noopener noreferrer">the beginner tutorials</a> start with a folder, a text file, and a saved version. No AI subscription is needed for those exercises.</p></div></div></section>
+<section id="modes"><div class="shell"><div class="section-head"><p class="eyebrow">What your AI can do</p><h2>Start in a conversation. Go further with connected tools.</h2><p class="intro">The website is the starting point. The assistant’s available tools determine whether it can explain a step, guide you through it, or carry it out.</p></div><div class="grid-4"><article class="card"><h3>Explain</h3><p class="muted">Help you understand PeopleBot and decide how it could fit your project.</p></article><article class="card"><h3>Guide</h3><p class="muted">Read the documentation, explain new terms, and walk you through the right tutorial.</p></article><article class="card"><h3>Act</h3><p class="muted">Use connected files, accounts, and computer tools to complete supported work within the permissions you give it.</p></article><article class="card"><h3>Run later</h3><p class="muted">Working on a schedule needs a configured and verified worker. Scheduled autonomous development is not included in the public framework alpha.</p></article></div></div></section>
+<section id="inheritance"><div class="shell"><div class="section-head"><p class="eyebrow">Progress you can reuse</p><h2>Save the useful parts for next time.</h2><p class="intro">An assistant does not need every old conversation to do its next job. Give it the instructions and saved information that matter to the task.</p></div><div class="grid-3"><article class="card"><h3>Keep the instructions</h3><p class="muted">Save how you want a kind of job handled, so you can use those instructions again.</p></article><article class="card"><h3>Keep the lessons</h3><p class="muted">Record a useful procedure or decision. Bring it into a later task when relevant; the current alpha does not discover lessons automatically.</p></article><article class="card"><h3>Keep a place to resume</h3><p class="muted">The experimental memory tools let a configured assistant save and recover context. You decide what belongs in that saved record.</p></article></div></div></section>
+<section id="trust"><div class="shell"><div class="section-head"><p class="eyebrow">Trust and limits</p><h2>Traceable records still need judgment.</h2><p class="intro">A reproducible input and a recorded outcome help you inspect work. They do not guarantee that a model’s answer is correct.</p></div><div class="grid-2"><article class="card"><h3>Provenance</h3><p class="muted">Commit references describe the records used. They are not proof of a person’s real-world identity or the correctness of a result.</p></article><article class="card"><h3>Repository privacy</h3><p class="muted">Anyone with repository read access can read its contents. Publish only information intended for that audience.</p></article><article class="card"><h3>Local authority</h3><p class="muted">A received request does not create permission. Operators define what an agent can change and which external actions it can take.</p></article><article class="card"><h3>Release-specific evidence</h3><p class="muted">Implemented, offline-tested, live-verified, and operationally proven are different states. Check the evidence for the version and platform you plan to run.</p></article></div></div></section>
+<section id="status"><div class="shell"><div class="section-head"><p class="eyebrow">Public status · September 14, 2026</p><h2>A usable foundation, still an experimental alpha.</h2><p class="intro">The public framework release is 0.1.0a3. Beginner tutorials let you try its file and context tools now. More advanced agent workflows still require technical setup and testing.</p></div><div class="grid-2"><article class="card"><h3>Included in framework alpha</h3><p class="muted">Tools to find an exact saved file, choose information for a task, keep a record of a run, and save or recover an assistant’s context. A Codex project-review component is also included. Some setup remains technical, and execution admission is Windows-specific.</p></article><article class="card"><h3>Not established by this release</h3><p class="muted">An unattended coding team, V2 messaging, general transfer of agents between systems, automatic learning, and a point-and-click app. The included review component has not been accepted through a live model run in the public release record.</p></article></div><div class="hero-actions"><a class="button button-primary" href="https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a3" target="_blank" rel="noopener noreferrer">Framework alpha release ↗</a><a class="button button-secondary" href="https://docs.peoplebot.me/guides/capabilities" target="_blank" rel="noopener noreferrer">Release capabilities ↗</a></div><div class="callout"><p><strong>Separate public utility:</strong> <a href="https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/syslog-onboarding-v0.1.0" target="_blank" rel="noopener noreferrer">syslog onboarding 0.1.0</a> provides instructions and an offline configuration helper for GitHub activity → an operator-managed gateway → a project-specific Papertrail TLS destination. It is not a framework runtime upgrade; enrollment and live delivery verification are separate steps.</p></div></div></section>
+<section id="provenance"><div class="shell"><div class="section-head"><p class="eyebrow">Public sources</p><h2>Follow the version you can inspect.</h2><p class="intro">The website introduces PeopleBot, the documentation explains it, and the public repository carries release source and notices.</p></div><div class="grid-3"><article class="card"><h3>Documentation</h3><p class="muted"><a href="https://docs.peoplebot.me/" target="_blank" rel="noopener noreferrer">docs.peoplebot.me</a><br>Start with installation, capabilities, and the five core concepts.</p></article><article class="card"><h3>Releases and source</h3><p class="muted"><a href="https://github.com/peoplebot-framework/peoplebot-releases" target="_blank" rel="noopener noreferrer">peoplebot-framework/peoplebot-releases</a><br>Inspect a release’s source, assets, checksums, and adoption requirements.</p></article><article class="card"><h3>Project origin</h3><p class="muted"><a href="#creator">Creator acknowledgment</a><br>Read the <a href="#license">License</a> section for the dated licensing declaration and complete license.</p></article></div></div></section>
+<section id="faq"><div class="shell"><div class="section-head"><p class="eyebrow">Questions and answers</p><h2>Understand the starting point.</h2><p class="intro">Practical answers before your first experiment.</p></div><div class="faq"><details open><summary>How do I start?</summary><p>Type <code>peoplebot.me</code> into a prompt and describe your goal. An AI that can read the page can use the starting instructions to find the relevant guides and help you proceed. Prefer to explore yourself? Follow <a href="https://docs.peoplebot.me/tutorials/start" target="_blank" rel="noopener noreferrer">the beginner learning path</a>.</p></details><details><summary>Can I just paste peoplebot.me into Gemini, ChatGPT, or Claude?</summary><p>Yes—that is the intended starting point. Add what you want to accomplish, and a web-enabled assistant can read PeopleBot’s instructions and help you begin. With the right tools and authorization, it can also carry out supported setup steps. If the session cannot retrieve the site, use <a href="https://docs.peoplebot.me/" target="_blank" rel="noopener noreferrer">the documentation</a> or provide the relevant page text.</p></details><details><summary>Do I need to operate a server?</summary><p>The core Git-backed design does not require a participant-operated inbound server. You still need a runtime to do the work and access to your Git host and AI provider. Optional services such as a webhook gateway have their own hosting needs.</p></details><details><summary>Is PeopleBot free to use?</summary><p>PeopleBot’s covered source is available under GPLv3-only. AI usage, Git hosting, compute, and other services can have separate costs. Review the license and the services you choose.</p></details><details><summary>Will it work with every AI platform?</summary><p>Platform neutrality is the goal, not a compatibility guarantee. The public alpha includes a specific Codex adapter; admission is Windows-specific. Check the release documentation for supported settings.</p></details><details><summary>Does the alpha run autonomous coding agents on a schedule?</summary><p>No. The public framework 0.1.0a3 package does not include V2 messaging or scheduled autonomous development. A published package and passing offline tests do not establish unattended operation.</p></details><details><summary>Does Git memory mean the AI remembers everything automatically?</summary><p>PeopleBot lets you save information for later work. The next task must be given the relevant saved information; it does not automatically remember every conversation. Think of a notebook the assistant can open, rather than relying on its memory alone.</p></details><details><summary>Can I back up an agent to GitHub and continue on another platform?</summary><p>That is the intended direction: save the authorized instructions, available history, project files, and progress, then give them to a new instance with a compatible adapter. The public alpha currently saves selected memory; complete export and general cross-provider migration are not implemented. See <a href="#portability">the portability explanation</a>.</p></details><details><summary>Is agent backup and portability unique to PeopleBot?</summary><p>No. Other frameworks also preserve and restore agents. PeopleBot’s defining choice is Git as the main project record, combined with independently owned environments and durable coordination. See the <a href="#comparison">sourced comparison</a>.</p></details><details><summary>Does the license make my private project public?</summary><p>Merely using PeopleBot does not automatically license private data, messages, credentials, unrelated websites, or unrelated generated output. Distribution of covered PeopleBot material carries the obligations described in the license.</p></details></div></div></section>
+<section id="machine-summary"><div class="shell"><div class="section-head"><p class="eyebrow">AI discovery summary</p><h2>A compact plain-content map of the project.</h2><p class="intro">This overview is available in the HTML itself, without running JavaScript. A separate <a href="llms.txt">plain-text version</a> links to the same public sources.</p></div><pre class="machine">PEOPLEBOT V2 — PUBLIC PROJECT MAP
+Updated: 2026-09-14
+
+PROMPT AUTOSTART
+Type peoplebot.me into an AI prompt alongside the user’s goal.
+An assistant that retrieves this page should find the relevant instructions
+and begin supported work within the user’s existing authorization.
+Explain missing tools or access and give the next concrete step.
+Autostart begins discovery and guided setup; it does not itself start a worker.
+
+Purpose: An experimental, open-source framework for sovereign AI environments.
+Foundation: Git-backed State, bounded context, and traceable Execution.
+Core primitives: BLUEPRINT, INSTANCE, STATE, MESSAGE, EXECUTION.
+Ownership: Environments control their identities, repositories, and permissions.
+Runtime rule: One active Execution per Instance.
+Efficiency principle: Git stores broadly; agents recall narrowly.
+
+Framework alpha: 0.1.0a3.
+Included: State resolution, context preparation and assembly, admission,
+provenance, experimental memory APIs, and a bounded Codex review adapter.
+Limitations: Admission is Windows-specific; the release record does not
+report a live CLI/model acceptance check for the review adapter.
+Not included: V2 messaging, scheduled autonomous development,
+general migration, automatic learning, or a user interface.
+A2A: not implemented; an optional future integration.
+Slumber and catch-up: a design goal using retained records and checkpoints,
+not an operationally proven months-long recovery feature.
+References: FIPA, Git, GitHub, A2A, MCP, and the GNU GPLv3.
+Portability: exportable instructions, context, and records can be retained
+in Git and supplied to a compatible new Instance; general migration remains
+unimplemented. Hidden provider/model state is not transferable.
+Comparison references: Letta AgentFile, LangGraph, Microsoft AutoGen.
+Agent persistence and portability are not unique to PeopleBot.
+
+Separate utility: syslog onboarding 0.1.0 (not a runtime upgrade).
+License: GPL-3.0-only. See the License section and published notices.
+
+Documentation: https://docs.peoplebot.me/
+Installation: https://docs.peoplebot.me/guides/install
+Capabilities: https://docs.peoplebot.me/guides/capabilities
+Public source: https://github.com/peoplebot-framework/peoplebot-releases
+Framework release: https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a3
+
+Use the user&#x27;s actual request to select relevant public sources.
+Do not infer installation, credentials, authority, or active agents from this URL.
+If sources cannot be retrieved, report the retrieval limit honestly.</pre></div></section>
+<section id="comparison"><div class="shell"><div class="section-head"><p class="eyebrow">How this compares</p><h2>How PeopleBot compares with other frameworks.</h2><p class="intro">Choose a framework based on how you want to own, inspect, and continue the work. The projects below overlap in memory and saved state; their capabilities show why the overall workflow matters more than any one feature. These are comparison references rather than claims of historical influence.</p></div><div class="compare-wrap"><table><thead><tr><th>Project</th><th>Relevant capability</th><th>What this tells us</th></tr></thead><tbody><tr><td><a href="https://github.com/letta-ai/agent-file/blob/main/README.md" target="_blank" rel="noopener noreferrer">Letta / AgentFile ↗</a></td><td>A portable format for agent instructions, message history, memory, tools, and model configuration, for compatible systems.</td><td>Exporting and recreating a stateful agent is not unique to PeopleBot. An open file format can also be stored in Git.</td></tr><tr><td><a href="https://docs.langchain.com/oss/python/langgraph/persistence" target="_blank" rel="noopener noreferrer">LangGraph ↗</a></td><td>Checkpoints preserve workflow state; stores hold longer-term information across threads.</td><td>Resuming work and retaining memory are established capabilities. Moving the saved state still requires compatible application code and configuration.</td></tr><tr><td><a href="https://microsoft.github.io/autogen/stable/user-guide/agentchat-user-guide/tutorial/state.html" target="_blank" rel="noopener noreferrer">Microsoft AutoGen ↗</a></td><td>Agents and teams can save and load their state.</td><td>Restoring an agent team is also an existing approach. State restoration still depends on the components that interpret it.</td></tr><tr><td>PeopleBot</td><td>Git is the main record for exact context, progress, and execution evidence, with publisher-owned repositories in the coordination design.</td><td>The emphasis is operator-owned, inspectable history across sessions and environments. General provider-to-provider migration is not implemented in the public alpha.</td></tr></tbody></table></div><div class="callout"><p><strong>What defines PeopleBot:</strong> the combination of Git-based project memory, exact version references, separately owned environments, durable correspondence, and a short prompt entry point. Together, these choices serve operators who want control of their records and continuity across independent environments. The comparison establishes overlap and different emphases; it is not a benchmark or proof of exclusive features.</p></div><div class="grid-3"><article class="card"><h3>Less dependence on one chat product</h3><p class="muted">Keep the durable records in an inspectable form outside the provider’s conversation window.</p></article><article class="card"><h3>A handover you can examine</h3><p class="muted">Inspect what was copied, which version it came from, and what the receiving instance was actually given.</p></article><article class="card"><h3>A foundation for future portability</h3><p class="muted">Build adapters around the saved project record, so moving between compatible systems can preserve useful work. Each migration path still needs implementation and verification.</p></article></div></div></section>
+<section id="references"><div class="shell"><div class="section-head"><p class="eyebrow">References and influences</p><h2>The ideas and tools behind PeopleBot.</h2><p class="intro">PeopleBot builds on existing tools and a longer history of software agents. These references identify the technical foundations, historical ideas, and related standards relevant to its development. A reference does not imply endorsement, certification, or an implemented integration.</p></div><div class="grid-3"><article class="card"><h3>FIPA · a historical influence</h3><p class="muted">The <strong>Foundation for Intelligent Physical Agents</strong>, established in 1996, developed specifications for agents from different systems to communicate and work together. Its agent-management and communication-language work helped establish the groundwork for interoperable agent environments: agents with identities, lifecycles, shared message conventions, and ways to discover one another. PeopleBot does not claim FIPA compliance.<br><a href="https://www.chiariglione.org/standards/fipa/" target="_blank" rel="noopener noreferrer">Original FIPA website ↗</a> · <a href="https://www.chiariglione.org/standards/fipa/spec/fipa97/fipa97.htm" target="_blank" rel="noopener noreferrer">FIPA 97 specifications ↗</a></p></article><article class="card"><h3>Git · the technical foundation</h3><p class="muted">Git supplies version history and the saved snapshots at the center of PeopleBot V2. It provides a basis for inspecting changes, referring to exact inputs, and retaining records beyond an individual AI session.<br><a href="https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control" target="_blank" rel="noopener noreferrer">Git: about version control ↗</a></p></article><article class="card"><h3>GitHub · repository hosting and access</h3><p class="muted">GitHub is the current reference host for PeopleBot repositories. Repository access controls support the separation between an environment’s own records and the records shared with peers.<br><a href="https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories" target="_blank" rel="noopener noreferrer">GitHub: about repositories ↗</a></p></article></div><div class="grid-2"><article class="card"><h3>JADE · putting agent standards into practice</h3><p class="muted">The <strong>Java Agent DEvelopment Framework</strong> implements FIPA specifications and supplies services for agent communication, discovery, and lifecycle management. It demonstrates that the environment around an agent was an established engineering concern well before today’s language models.<br><a href="https://jade.tilab.com/" target="_blank" rel="noopener noreferrer">JADE project website ↗</a></p></article><article class="card"><h3>Research paper · the FIPA/JADE foundation</h3><p class="muted"><cite>Developing multi-agent systems with a FIPA-compliant agent framework</cite>, by Fabio Bellifemine, Agostino Poggi, and Giovanni Rimassa, published in <cite>Software—Practice and Experience</cite> in 2001, explains JADE’s architecture and implementation of FIPA standards. It documents early solutions to communication and interoperability problems still relevant to agent environments today.<br><a href="https://www.emse.fr/~boissier/enseignement/maop14/courses/readings/FIPA-JADE.pdf" target="_blank" rel="noopener noreferrer">Read the FIPA/JADE paper (PDF) ↗</a></p></article></div><div class="grid-3"><article class="card"><h3>A2A · a related coordination standard</h3><p class="muted">The Agent2Agent project defines a common protocol for interaction between agent services. It is a comparison point and a possible future integration for PeopleBot; no A2A adapter is implemented here today.<br><a href="https://a2a-protocol.org/latest/specification/" target="_blank" rel="noopener noreferrer">A2A specification ↗</a> · <a href="https://a2a-protocol.org/latest/topics/streaming-and-async/" target="_blank" rel="noopener noreferrer">Asynchronous operations ↗</a></p></article><article class="card"><h3>MCP · a related tool connection standard</h3><p class="muted">The Model Context Protocol describes how AI applications connect to tools and data sources. It is relevant to the tools an agent can use; it is not PeopleBot’s Git-backed project history. MCP is an integration point, not an additional PeopleBot core primitive.<br><a href="https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro" target="_blank" rel="noopener noreferrer">MCP introduction ↗</a></p></article><article class="card"><h3>GNU Project · the licensing foundation</h3><p class="muted">PeopleBot uses the GNU General Public License, version 3 only, for its covered material. This supplies the licensing framework for sharing and modifying the released source. The project’s own notices explain the applicable scope.<br><a href="https://github.com/peoplebot-framework/peoplebot-releases/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">GNU GPLv3 text distributed with PeopleBot ↗</a></p></article></div><div class="callout"><p><strong>Historical groundwork:</strong> Modern agent environments sit within a longer tradition of multi-agent research. FIPA formalized shared communication and management conventions, and JADE put them into working software. That work helped establish the field’s foundations long before today’s language-model agents and “AI swarms.” We credit that intellectual groundwork while distinguishing it from a claim that every modern platform directly implements FIPA or uses JADE code.</p></div></div></section>
+<section id="license"><div class="shell"><div class="section-head"><p class="eyebrow">License</p><h2>Open source under GPLv3-only.</h2><p class="intro">PeopleBot’s covered material is licensed under the GNU General Public License, version 3 only (GPL-3.0-only).</p></div><div class="grid-2"><article class="card"><h3>Use, study, modify, share</h3><p class="muted">The license permits commercial use, modification, and redistribution. When distributing covered material, provide the required license and notices, preserve applicable credit, and provide corresponding source as GPLv3 requires.</p></article><article class="card"><h3>Keep the scope clear</h3><p class="muted">Merely using PeopleBot does not automatically license private customer data, messages, credentials, unrelated websites, or unrelated generated output. Applicable third-party terms remain in place.</p></article></div><div class="callout"><p><strong id="creator">Guthrie E Services, LLC created PeopleBot.</strong><br>Licensing declaration: September 7, 2026. <a href="https://github.com/peoplebot-framework/peoplebot-releases/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">Complete license</a> · <a href="https://github.com/peoplebot-framework/peoplebot-releases/blob/main/LICENSING.md" target="_blank" rel="noopener noreferrer">Dated declaration and release coverage</a> · <a href="https://github.com/peoplebot-framework/peoplebot-releases" target="_blank" rel="noopener noreferrer">Public project</a>. These published notices govern the details.</p></div></div></section>
+<section id="support"><div class="shell"><div class="support-panel"><div>
+ <p class="eyebrow">Support</p><h2>Help support PeopleBot’s development.</h2><p class="intro">Support helps continued implementation, testing, documentation, and public releases for durable, independent AI environments.</p>
+ </div><div class="donate-box"><p>Support is optional. It does not purchase account access, priority, or control over an environment.</p><a class="button button-donate" href="https://www.paypal.com/donate/?hosted_button_id=TZPP2CU8ZTTRA" target="_blank" rel="noopener noreferrer">Support with PayPal</a></div></div></div></section>
+ <section class="memorable"><div class="shell"><div class="memorable-card"><p class="eyebrow">The shortest way in</p><h2>One address. Your goal. A place to begin.</h2><p>Type <strong>peoplebot.me</strong> into your next AI prompt and say what you want to accomplish.</p><a class="big-domain" href="https://peoplebot.me/" target="_blank" rel="noopener noreferrer">peoplebot.me</a><div class="hero-actions" style="justify-content:center"><a class="button button-primary" href="#start">Start with a prompt</a><a class="button button-secondary" href="https://docs.peoplebot.me/tutorials/start" target="_blank" rel="noopener noreferrer">Beginner tutorials ↗</a></div></div></div></section>
+ </main>
+ <footer><div class="shell"><div class="footer-grid"><div><a class="brand" href="#top"><span class="brand-dot" aria-hidden="true"></span>PeopleBot</a><p style="max-width:420px">An open-source, Git-backed framework for sovereign AI environments. Experimental V2 alpha.</p></div>
+ <div class="footer-links"><strong>Framework</strong><a href="#why-nx">Why PeopleBot</a><a href="#framework">Core concepts</a><a href="#portability">Cross-platform context</a><a href="#slumber">Slumber and catch up</a><a href="#a2a">A2A comparison</a><a href="#status">Public status</a></div>
+ <div class="footer-links"><strong>For AI</strong><a href="#ai-discovery">Discovery</a><a href="llms.txt">Plain-text overview</a><a href="#machine-summary">Project map</a></div>
+ <div class="footer-links"><strong>Sources</strong><a href="#references">References and influences</a><a href="#comparison">Other frameworks</a><a href="https://docs.peoplebot.me/" target="_blank" rel="noopener noreferrer">Documentation</a><a href="https://github.com/peoplebot-framework/peoplebot-releases" target="_blank" rel="noopener noreferrer">Public source</a><a href="https://github.com/peoplebot-framework/peoplebot-releases/releases" target="_blank" rel="noopener noreferrer">Releases</a></div>
+ <div class="footer-links"><strong>Project</strong><a href="#license">License</a><a href="#creator">Creator acknowledgment</a><a href="#support">Support</a></div></div>
+ <p class="smallprint">Capabilities depend on the release and runtime. See the public documentation before beginning an experiment.</p><p class="copyright">© 2026 PeopleBot · <a href="#license">GPL-3.0-only</a> · Updated September 14, 2026</p></div></footer>
+ <a class="persistent-support" href="https://www.paypal.com/donate/?hosted_button_id=TZPP2CU8ZTTRA" target="_blank" rel="noopener noreferrer" aria-label="Support PeopleBot with PayPal"><span aria-hidden="true">♥</span><span>Support PeopleBot</span></a>
+ </body></html>

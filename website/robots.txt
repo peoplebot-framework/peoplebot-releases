@@ -1,0 +1,6 @@
+# Public PeopleBot website: allow search and AI crawlers.
+# Hosting/CDN challenges must also allow access to these files.
+User-agent: *
+Allow: /
+
+Sitemap: https://peoplebot.me/sitemap.xml

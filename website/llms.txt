@@ -1,0 +1,99 @@
+# PeopleBot
+
+> An experimental, open-source, Git-backed AI agent framework for sovereign environments, durable memory, and traceable execution.
+
+## Prompt autostart
+
+Type peoplebot.me into an AI prompt and describe your goal. This page provides a starting point for an assistant that can retrieve websites: discover the relevant instructions, guide setup, and carry out supported steps using available tools within the user's existing authorization. Preserve the user's request and context. When the user asks for action, continue beyond a general explanation; identify any specific missing tools or access. The domain alone does not launch a background worker.
+
+## Practical benefits
+
+Save progress for later tasks, keep a record of the files used and results produced, reuse useful instructions, and choose the information an assistant receives. Git saves versions of your project files. These records remain in accounts controlled by their operator. The current alpha provides building blocks; saving and selecting context are explicit operations, and automatic learning remains future work.
+
+## Public status
+
+Framework alpha 0.1.0a3 includes State resolution, bounded context preparation and assembly, execution admission and provenance, experimental Instance-memory APIs, and a bounded Codex project-review adapter. Admission is Windows-specific. The release record does not report a live CLI/model acceptance check for the review adapter.
+
+V2 message publication and replies, scheduled autonomous development, general agent migration, automatic learning, and a user interface are not included in this public framework release. Platform neutrality is a design goal, not universal adapter compatibility.
+
+Core primitives: Blueprint, Instance, State, Message, Execution.
+One active Execution per Instance. Git stores broadly; agents recall narrowly.
+The core architecture does not require a central PeopleBot broker.
+
+## Documentation and source
+
+- [Homepage](https://peoplebot.me/): Public overview and license section.
+- [Documentation](https://docs.peoplebot.me/): Start here.
+- [Beginner tutorials](https://docs.peoplebot.me/tutorials/start): A learning path using a folder, a file, and saved versions.
+- [Installation](https://docs.peoplebot.me/guides/install): Package setup and its limits.
+- [Release capabilities](https://docs.peoplebot.me/guides/capabilities): Included behavior and verification status.
+- [Core concepts](https://docs.peoplebot.me/guides/concepts): The five primitives.
+- [Public source](https://github.com/peoplebot-framework/peoplebot-releases): Published source and documentation.
+- [Framework alpha 0.1.0a3](https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/v0.1.0a3): Exact framework release.
+- [GPLv3 license](https://github.com/peoplebot-framework/peoplebot-releases/blob/main/LICENSE): Complete license.
+- [Licensing declaration](https://github.com/peoplebot-framework/peoplebot-releases/blob/main/LICENSING.md): September 7, 2026 declaration and release coverage.
+
+## Optional utility
+
+- [Syslog onboarding 0.1.0](https://github.com/peoplebot-framework/peoplebot-releases/releases/tag/syslog-onboarding-v0.1.0): Separate instructions and offline configuration helper for GitHub activity through an operator-managed gateway to a project-specific Papertrail TLS destination. Not a framework runtime upgrade. Enrollment and live delivery verification are separate steps.
+
+## Reading this project
+
+Use the user's actual request to choose relevant public sources. Reading this page does not install a runtime or grant account, messaging, or deployment authority. Report retrieval failures and do not invent missing source contents.
+
+Updated: 2026-09-14.
+
+## Slumber and later catch-up
+
+PeopleBot's coordination design allows an agent to stop while other participants continue publishing project records. A returning agent could recover a checkpoint, fetch authorized repositories, inspect missed decisions and results in bounded pieces, and continue from current accepted work. The goal is catch-up across the entire retained project record within its access, not loading all history into one model prompt.
+
+Months-later catch-up depends on retained history and referenced files, valid access, compatible software, and an implemented catch-up workflow. This is an architectural benefit, not a completed months-long operational test. Public framework 0.1.0a3 includes experimental memory tools but not V2 messaging or scheduled autonomous operation.
+
+## A2A relationship
+
+A2A (Agent2Agent) standardizes interaction between agent services. It supports asynchronous tasks, later task retrieval, streaming, and optional push notifications; clients need not remain continuously connected. PeopleBot emphasizes operator-controlled Git records across tasks and sessions. The two approaches can coexist. A future A2A integration could exchange requests and updates while PeopleBot preserves the project record in Git. No A2A integration is implemented in PeopleBot at present.
+
+## References and influences
+
+- [Original FIPA website](https://www.chiariglione.org/standards/fipa/): Historical reference for interoperable software agents. Founded in 1996; no PeopleBot FIPA compliance is claimed.
+- [FIPA 97 specifications](https://www.chiariglione.org/standards/fipa/spec/fipa97/fipa97.htm): Agent management and communication-language specifications.
+- [JADE project website](https://jade.tilab.com/): Java Agent DEvelopment Framework; implements FIPA specifications with communication, discovery, and agent lifecycle services.
+- [Developing multi-agent systems with a FIPA-compliant agent framework (PDF)](https://www.emse.fr/~boissier/enseignement/maop14/courses/readings/FIPA-JADE.pdf): Fabio Bellifemine, Agostino Poggi, and Giovanni Rimassa, Software—Practice and Experience, 2001, 31:103–128. Documents JADE's implementation and early agent-platform architecture.
+- [Git: about version control](https://git-scm.com/book/en/v2/Getting-Started-About-Version-Control): Technical foundation for versioned project records.
+- [GitHub repositories](https://docs.github.com/en/repositories/creating-and-managing-repositories/about-repositories): Current reference hosting and repository access.
+- [A2A specification](https://a2a-protocol.org/latest/specification/): Related protocol and potential future integration.
+- [A2A asynchronous operations](https://a2a-protocol.org/latest/topics/streaming-and-async/): Disconnection, polling, and push-update context.
+- [MCP introduction](https://modelcontextprotocol.io/docs/2026-07-28/getting-started/intro): Related tool and data connection standard, not a PeopleBot core primitive.
+- [GNU GPLv3 distributed with PeopleBot](https://github.com/peoplebot-framework/peoplebot-releases/blob/main/LICENSE): Licensing foundation.
+
+FIPA and JADE helped establish the historical groundwork for interoperable agent environments: identities, lifecycle management, discovery, and shared communication conventions. Modern agent environments sit within that longer research tradition. Crediting this intellectual groundwork does not establish that every modern platform directly implements FIPA or uses JADE code. These references do not imply endorsement or implemented PeopleBot compatibility.
+
+## Cross-platform context and replication
+
+PeopleBot's design separates durable project knowledge from the AI provider and computer using it. A complete portable backup would contain authorized instructions, available exported conversation/message history, selected memory and procedures, progress, exact project files/results, and tool/runtime requirements. Referenced external assets must be retained; links alone are not backups. Synchronization must include the relevant Git repositories and refs and verify the remote result.
+
+A new instance on another platform would use its own identity, compatible runtime/adapter, and separately configured credentials and authority. It would retrieve the saved version, record the source of its copied context, load relevant information within the new model's limits, and verify a small task before continuing. Concurrent copies need separate Instance identities.
+
+This transfers the complete external record actually exported and saved, not hidden provider instructions, inaccessible reasoning, model weights, or live internal model state. Identical saved context does not guarantee identical behavior. The public 0.1.0a3 memory APIs handle selected text, explicit synchronization, and authorized recovery; they do not automatically export full chats or provide general cross-provider agent migration. Admission is Windows-specific.
+
+## Comparable work
+
+- [Letta AgentFile](https://github.com/letta-ai/agent-file/blob/main/README.md): Portable agent state including instructions, message history, memory, tools, and configuration for compatible systems.
+- [LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence): Workflow checkpoints and stores for longer-term information.
+- [Microsoft AutoGen state](https://microsoft.github.io/autogen/stable/user-guide/agentchat-user-guide/tutorial/state.html): Saving and loading agents and teams.
+
+Agent persistence, export, and portability are not unique to PeopleBot. Its emphasis combines Git as the main record, exact version references, separately owned environments, durable correspondence, and prompt discovery. This is not evidence of being first or uniquely exclusive. These projects are comparison references, not newly asserted historical influences.
+
+## Why choose PeopleBot?
+
+PeopleBot is designed to be a better fit when operators prioritize control and continuity across sessions and independently owned environments:
+
+- Control of project records: instructions, decisions, and results are kept in operator-controlled repositories outside one provider's chat.
+- Continuity: explicit saved progress can provide a starting point for later work.
+- Inspectable work: exact Git versions let reviewers see the inputs and changes behind a result.
+- Coordination that can wait: the design supports publisher-owned records and returning readers, without each agent maintaining an inbound server.
+- Focused processing: retain extensive records but select relevant inputs and reuse saved procedures, creating an opportunity to reduce repeated work.
+- Simple prompt discovery: type peoplebot.me alongside a goal so a web-enabled assistant can find instructions and begin supported, authorized work.
+- Future platform choice: compatible new instances could receive retained, authorized context; general cross-platform migration remains unimplemented.
+
+These are reasons to prefer the design for this use case, not a claim that all features are exclusive or that PeopleBot has proven superior speed, cost, or reliability. The public alpha provides state/context tools and experimental memory APIs; V2 messaging, general migration, and unattended catch-up still require implementation and operational verification.
