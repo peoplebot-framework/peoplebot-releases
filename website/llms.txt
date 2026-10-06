@@ -97,6 +97,10 @@ This website is maintained from its GitHub website folder. Publishing uses a dir
 
 ## References and influences
 
+- [GCC — Git Context Controller](https://github.com/ImprintLab/git-context-controller): Related work on versioned agent memory and context retrieval.
+- [GCC research paper](https://arxiv.org/abs/2508.00031): Git Context Controller: Manage the Context of LLM-based Agents like Git, Junde Wu and colleagues. First submitted July 30, 2025; v3 revised July 24, 2026. [PDF](https://arxiv.org/pdf/2508.00031). Describes COMMIT, BRANCH, MERGE, and CONTEXT operations for persistent agent context.
+
+
 - [Original FIPA website](https://www.chiariglione.org/standards/fipa/): Historical reference for interoperable software agents. Founded in 1996; no PeopleBot FIPA compliance is claimed.
 - [FIPA 97 specifications](https://www.chiariglione.org/standards/fipa/spec/fipa97/fipa97.htm): Agent management and communication-language specifications.
 - [JADE project website](https://jade.tilab.com/): Java Agent DEvelopment Framework; implements FIPA specifications with communication, discovery, and agent lifecycle services.
