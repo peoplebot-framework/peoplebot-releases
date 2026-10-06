@@ -31,7 +31,8 @@ def transfer(name, output=None, upload=None):
     args = ['curl', '--disable', '--config', '-', '--silent', '--show-error',
             '--fail', '--ssl-reqd', '--tlsv1.2', '--ftp-pasv', '--connect-timeout', '30',
             '--max-time', '180', '--proto', '=ftp',
-            'ftp://ftp.webcustoms.com:21/' + quote(name, safe='/')]
+            '--connect-to', 'chi200.greengeeks.net:21:ftp.webcustoms.com:21',
+            'ftp://chi200.greengeeks.net:21/' + quote(name, safe='/')]
     if upload is not None:
         args += ['--ftp-create-dirs', '--upload-file', str(upload)]
     else:
