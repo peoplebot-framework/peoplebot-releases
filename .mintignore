@@ -8,3 +8,5 @@
 /LICENSE
 /MANIFEST.in
 /pyproject.toml
+/website/
+/scripts/
