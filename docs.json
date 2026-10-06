@@ -28,7 +28,8 @@
           "tutorials/snapshots",
           "tutorials/read-your-file",
           "tutorials/choose-context",
-          "tutorials/write-a-task"
+          "tutorials/write-a-task",
+          "tutorials/termius-mobile"
         ]
       },
       {
@@ -53,7 +54,8 @@
           "reference/cli",
           "guides/troubleshooting",
           "reference/releases",
-          "reference/changelog"
+          "reference/changelog",
+          "reference/termius-open-source"
         ]
       }
     ]

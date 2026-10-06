@@ -1,0 +1,113 @@
+---
+title: "Talk to your agents from your phone"
+description: "Use Termius as a mobile console for PeopleBot project work."
+---
+
+Your phone can be the place where you check on a project, give an agent its next assignment, and review a saved result. In our PeopleBot workflow, we use Termius to reach command-line agents running on our computers. We switch to the agent we need and type to it much as we would from a desktop terminal.
+
+The agent and its tools run on the remote computer. Termius provides the terminal on your phone. Each agent still has its own conversation; this setup does not combine them into a single inbox.
+
+## What each part does
+
+| Part | Job |
+| --- | --- |
+| Termius | Opens the remote terminal from your phone |
+| Agent CLI | Accepts your requests and performs work on its computer |
+| Persistent terminal session | Keeps the terminal process available when the phone disconnects |
+| PeopleBot workflow | Organizes assignments, project context, saved results, and handoffs |
+
+This is an operating procedure you can use with PeopleBot, not a built-in Termius integration or an automatic feature of the public package.
+
+## 1. Ask your assistant to prepare the connection
+
+Start with Termius installed on your phone, an authorized remote connection, and an agent CLI that already works on the target computer. Your administrator supplies connection and authentication settings privately.
+
+A PeopleBot project assistant with access to that computer can inspect the environment, prepare a launcher, and give you the exact Termius settings and snippet to enter. Ask:
+
+> Help me reach this project agent from Termius on my phone. Inspect the operating system, shell, installed agent CLI, and project folder. Prepare and test a named persistent session that reconnects to the existing agent before creating anything new. Give me a short connection label and the exact launcher command for this environment. Keep credentials and connection details out of public documentation. Tell me what you verified and what still needs a phone test.
+
+The launcher should enter the correct project, use the installed agent's supported startup or resume procedure, and attach to an existing session when present. We have used tmux on Linux and psmux on Windows for persistent terminal sessions. The assistant must check the tool and version on your computer; commands are not interchangeable.
+
+On Windows, have the assistant test the actual shell and executable entry point. If a launcher is blocked by a script policy, diagnose that specific problem rather than broadly disabling protections.
+
+## 2. Give every agent a recognizable label
+
+In Termius, create or select the host using the private connection settings supplied for you. Use labels that describe the work:
+
+| Example label | What you expect to find |
+| --- | --- |
+| Development agent | The agent making project changes |
+| Review agent | The agent checking results |
+| Operations agent | The agent handling an assigned maintenance task |
+
+These are examples, not a required PeopleBot configuration. Your setup might have several sessions on one computer or agents on different computers.
+
+Connect and confirm the expected project and agent before assigning work. Keep addresses, usernames, authentication material, and screenshots containing connection details private.
+
+## 3. Save the tested launcher as a snippet
+
+A Termius snippet saves a shell command so you do not have to type it repeatedly on a phone.
+
+On mobile, open **Vaults → Snippets**, tap **+**, choose **New Snippet**, and enter a name and the tested launcher in **Script**. Save it. A name such as `connect-demo-reviewer` makes the target easy to recognize.
+
+From a connected terminal, open the additional keyboard's four-square menu and choose **Snippets**. On iPad, use the right-side panel. Run the launcher at a **shell prompt**, before entering the agent conversation. Sending it while the agent is accepting messages would give the command to the agent instead.
+
+After testing, you can select a snippet under the host's **Startup Command** setting. Use a launcher that attaches to the existing named session instead of starting a duplicate agent. Select only the intended target; do not broadcast a task to multiple hosts.
+
+See [Termius's snippet instructions](https://docs.termius.com/terminal/snippets) for current controls and behavior. Feature availability can depend on your plan and app version.
+
+## 4. Use the phone as your agent console
+
+Once the agent is accepting input, type ordinary requests. You do not need to begin with a complicated keyboard shortcut.
+
+**Check where you are:**
+
+> Tell me which project and agent Instance this conversation belongs to, what you are working on, and whether anything needs my decision.
+
+**Assign a bounded task:**
+
+> Read the current task and saved project context. Complete the assigned documentation change, check the result, and save a report with the changed files, evidence, and anything unresolved.
+
+**Review before continuing:**
+
+> Show me the saved result and the checks that support it. Separate completed work from planned or unverified work.
+
+**Prepare to leave:**
+
+> Save a concise handoff with the current task, decisions, exact saved work, checks, and next step. Tell me where it is stored.
+
+Switch to another labeled session when you need another agent. Typing through Termius is your direct conversation with that agent; any agent-to-agent coordination is a separate part of the project workflow.
+
+Follow [Run a project with your assistant](/tutorials/working-together) for task structure and [Check whether work is finished](/tutorials/review-results) for reviewing the answer.
+
+## 5. Test reconnecting without restarting the work
+
+Before relying on the setup:
+
+1. Ask the agent to identify its project and current conversation.
+2. Send a small status request and confirm the response.
+3. Disconnect the phone without exiting the agent process.
+4. Reconnect using the saved launcher.
+5. Confirm you returned to the same session and did not start another agent.
+
+A persistent terminal can preserve a running agent across a client disconnect while its computer stays running. Closing the agent, ending the persistent session, or rebooting the computer is different.
+
+After a reboot, use the provider's supported conversation-resume procedure and PeopleBot's saved context and handoff. Automatic startup and recovery require separate configuration and testing. Our mobile access work does not establish that every agent automatically survives a reboot.
+
+Keep one active owner for a provider conversation and its PeopleBot Instance. If reconnecting produces a fresh conversation, pause and check the launcher instead of launching additional copies.
+
+## When something looks wrong
+
+| Symptom | What to check |
+| --- | --- |
+| A shell appears instead of the agent | Whether the launcher ran and selected the intended session |
+| Every connection starts a new conversation | Whether the launcher attaches before creating, and uses the provider's supported resume option |
+| You reach the wrong project | The connection label, session name, and launcher's working folder |
+| Commands appear as agent messages | Whether you ran a shell snippet inside the agent's input |
+| Work is missing after a reboot | The saved provider conversation, project records, and separately tested recovery procedure |
+
+Terminal scrollback is convenient, but it is not your durable project record or a verified backup. Save important results and use [Continue in a new chat](/tutorials/continue-a-project) and [Verify your backup](/tutorials/verify-backup) when needed.
+
+## About Termius
+
+[Termius](https://termius.com/) supplies the SSH client used in this workflow. See our [proposed open-source support placement](/reference/termius-open-source) for the acknowledgment prepared for its open-source program.
