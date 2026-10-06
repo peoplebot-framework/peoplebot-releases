@@ -1,0 +1,54 @@
+name: PeopleBot website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'website/**'
+      - '.github/workflows/peoplebot-website.yml'
+      - 'scripts/peoplebot_website.py'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Import only, or publish (imports first if needed).'
+        required: true
+        default: deploy
+        type: choice
+        options: [import, deploy]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: peoplebot-website
+  cancel-in-progress: false
+
+jobs:
+  website:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - name: Import current site if no GitHub source exists
+        id: source
+        env:
+          PEOPLEBOT_FTP_PASSWORD: ${{ secrets.PEOPLEBOT_FTP_PASSWORD }}
+        run: |
+          if [ ! -d website ]; then
+            python3 scripts/peoplebot_website.py import
+            echo 'imported=true' >> "$GITHUB_OUTPUT"
+          fi
+      - name: Save initial website to GitHub before publishing
+        if: steps.source.outputs.imported == 'true'
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- website/
+          git commit -m 'Import current peoplebot.me website through restricted FTPS'
+          git push origin HEAD:main
+      - name: Publish and verify website over FTPS
+        if: github.event_name == 'push' || inputs.mode == 'deploy'
+        env:
+          PEOPLEBOT_FTP_PASSWORD: ${{ secrets.PEOPLEBOT_FTP_PASSWORD }}
+        run: python3 scripts/peoplebot_website.py deploy
