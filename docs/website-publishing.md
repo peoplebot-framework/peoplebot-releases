@@ -40,3 +40,18 @@ loosening repository protection automatically.
 The importer is scoped to this static homepage and referenced public assets,
 not a general account backup. It does not copy hidden files, server-side code,
 or other sites. Nested CSS asset layouts require adapting the importer first.
+
+## Verified setup — October 5, 2026 (Pacific)
+
+Initial import and deployment succeeded in Actions run 37421881366. Five files
+were imported from the live host and committed as 1afcb3b: index.html, llms.txt,
+peoplebot-logo.png, robots.txt, and sitemap.xml. Every upload was downloaded
+and SHA-256 verified. No page content was edited during setup.
+
+The server certificate covers chi200.greengeeks.net rather than the
+ftp.webcustoms.com alias. curl uses chi200.greengeeks.net for TLS identity and
+--connect-to to route to the same user-specified ftp.webcustoms.com endpoint.
+Certificate validation stays enabled. Keep this mapping current if hosting moves.
+
+Make future content changes in GitHub. Manual changes made on the host will not
+be imported again automatically and may be overwritten by the next deployment.
