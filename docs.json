@@ -20,15 +20,15 @@
         "group": "Beginner tutorials",
         "pages": [
           "tutorials/start",
+          "tutorials/working-together",
+          "tutorials/review-results",
+          "tutorials/continue-a-project",
+          "tutorials/verify-backup",
           "tutorials/terminal",
           "tutorials/snapshots",
           "tutorials/read-your-file",
           "tutorials/choose-context",
-          "tutorials/write-a-task",
-          "tutorials/working-together",
-          "tutorials/review-results",
-          "tutorials/continue-a-project",
-          "tutorials/verify-backup"
+          "tutorials/write-a-task"
         ]
       },
       {
@@ -52,7 +52,8 @@
         "pages": [
           "reference/cli",
           "guides/troubleshooting",
-          "reference/releases"
+          "reference/releases",
+          "reference/changelog"
         ]
       }
     ]
