@@ -20,6 +20,10 @@
         "group": "Beginner tutorials",
         "pages": [
           "tutorials/start",
+          "tutorials/working-together",
+          "tutorials/review-results",
+          "tutorials/continue-a-project",
+          "tutorials/verify-backup",
           "tutorials/terminal",
           "tutorials/snapshots",
           "tutorials/read-your-file",
@@ -48,7 +52,8 @@
         "pages": [
           "reference/cli",
           "guides/troubleshooting",
-          "reference/releases"
+          "reference/releases",
+          "reference/changelog"
         ]
       }
     ]

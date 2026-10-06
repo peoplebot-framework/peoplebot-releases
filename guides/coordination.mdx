@@ -44,3 +44,11 @@ links remain unknown; they do not erase known Instance observations. Token count
 and account allowance are separate evidence.
 
 Read the [Instance operating model](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/operations/instance-operating-model.md), [messaging contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/contracts/messaging-v0.md), and [work-cycle contract](https://github.com/peoplebot-framework/peoplebot-releases/blob/v0.1.0a4/docs/contracts/work-cycle-v0.md).
+
+## How we coordinate work in practice
+
+A person and a coordinating assistant prepare a bounded assignment; a project agent reads it, works on its own branch, and publishes a report. The coordinator inspects the referenced change and records acceptance or a specific follow-up. [Follow the tutorial](/tutorials/working-together).
+
+A shared GitHub coordination folder is a practical handoff channel. It should not be confused with automatically invoking the native message API or polling an inbox. Manual kickoff remains valid when a verified worker is not active.
+
+User documentation is maintained centrally: workers supply implementation evidence, exact commands, checks, and limitations; the documentation owner reconciles those reports into public guides. Private operations and raw sessions stay out of public documentation.

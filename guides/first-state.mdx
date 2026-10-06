@@ -24,13 +24,13 @@ A detached checkout here deliberately selects the published distribution commit.
 Windows PowerShell:
 
 ```powershell
-.\.venv\Scripts\python.exe -m peoplebot resolve-state --repository https://github.com/peoplebot-framework/peoplebot-releases --checkout ./peoplebot-source --commit <public-distribution-commit> --path peoplebot/state.py
+.\.venv\Scripts\python.exe -m peoplebot resolve-state --repository https://github.com/peoplebot-framework/peoplebot-releases --checkout ./peoplebot-source --commit d5f4bbc4c0d10212d6451bc07bfbe282ed8960d4 --path peoplebot/state.py
 ```
 
 Linux:
 
 ```bash
-./.venv/bin/python -m peoplebot resolve-state --repository https://github.com/peoplebot-framework/peoplebot-releases --checkout ./peoplebot-source --commit <public-distribution-commit> --path peoplebot/state.py
+./.venv/bin/python -m peoplebot resolve-state --repository https://github.com/peoplebot-framework/peoplebot-releases --checkout ./peoplebot-source --commit d5f4bbc4c0d10212d6451bc07bfbe282ed8960d4 --path peoplebot/state.py
 ```
 
 ## 3. Read the result
@@ -49,7 +49,7 @@ The output is one JSON object. Key values are:
 This identifies the file; it does not print its contents. To inspect the same committed content using Git:
 
 ```bash
-git -C peoplebot-source show <public-distribution-commit>:peoplebot/state.py
+git -C peoplebot-source show d5f4bbc4c0d10212d6451bc07bfbe282ed8960d4:peoplebot/state.py
 ```
 
 ## 4. Understand what stays fixed
